@@ -4,6 +4,12 @@ resource "google_service_account" "goodnews_api" {
   display_name = "goodnews API service account for Cloud Run"
 }
 
+resource "google_project_iam_binding" "goodnews_api" {
+  project  = data.terraform_remote_state.holi_infra_state.outputs.shared_project_id
+  members = ["serviceAccount:${google_service_account.goodnews_api.email}"]
+  role = "roles/secretmanager.secretAccessor"
+}
+
 output "cloud_run_service_account_email" {
   value = google_service_account.goodnews_api.email
 }

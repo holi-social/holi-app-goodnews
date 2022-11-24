@@ -172,9 +172,11 @@ if "you know what you're doing".
 
 ### Configuration
 
-| Environment Variable | Default Value | Description                     |
-| -------------------- | ------------- | ------------------------------- |
-| PORT                 | 8002          | the port to listen on           |
-| CACHE_ENABLED        | true          | wether or not to enable caching |
-| CACHE_TTL_MS         | 60 seconds    | time-to-live in ms              |
-| CONTENTFUL_API_KEY   | undefined     | GoodNews Contentful API key     |
+| Environment Variable                 | Default Value | Description                                   |
+| ------------------------------------ | ------------- | --------------------------------------------- |
+| PORT                                 | 8002          | the port to listen on                         |
+| CACHE_ENABLED                        | true          | wether or not to enable caching               |
+| CACHE_TTL_MS                         | 60 seconds    | time-to-live in ms                            |
+| CONTENTFUL_SPACE_ID                  | undefined     | GoodNews Contentful Space ID                  |
+| CONTENTFUL_DELIVERY_API_ACCESS_TOKEN | undefined     | GoodNews Contentful Delivery API Access Token |
+| CONTENTFUL_ENVIRONMENT               | master        | GoodNews Contentful Environment               |

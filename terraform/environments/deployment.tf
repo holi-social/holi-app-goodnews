@@ -47,8 +47,22 @@ resource "google_cloud_run_service" "goodnews_api" {
           value = local.environment
         }
         env {
-          name  = "CONTENTFUL_API_KEY"
-          value = google_apikeys_key.deployment.key_string
+          name  = "CONTENTFUL_SPACE_ID"
+          value_from {
+            secret_key_ref {
+              key = "latest"
+              name = "GOODNEWS_CONTENTFUL_SPACE_ID"
+            }
+          }
+        }
+        env {
+          name  = "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"
+          value_from {
+            secret_key_ref {
+              key = "latest"
+              name = "GOODNEWS_CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"
+            }
+          }
         }
         # env {
         #   name  = "ENVIRONMENT_ID"
