@@ -172,10 +172,9 @@ if "you know what you're doing".
 
 ### Configuration
 
-| Environment Variable     | Default Value | Description                                |
-| ------------------------ | ------------- | ------------------------------------------ |
-| PORT                     | 8001          | the port to listen on                      |
-| CACHE_ENABLED            | true          | wether or not to enable caching            |
-| CACHE_TTL_MS_BETTERPLACE | 60 seconds    | time-to-live in ms for betterplace caching |
-| CACHE_TTL_MS_PLACES      | 24 hours      | time-to-live in ms for places caching      |
-| CONTENTFUL_API_KEY       | undefined     | GoodNews Contentful API key                |
+| Environment Variable | Default Value | Description                     |
+| -------------------- | ------------- | ------------------------------- |
+| PORT                 | 8001          | the port to listen on           |
+| CACHE_ENABLED        | true          | wether or not to enable caching |
+| CACHE_TTL_MS         | 60 seconds    | time-to-live in ms              |
+| CONTENTFUL_API_KEY   | undefined     | GoodNews Contentful API key     |
