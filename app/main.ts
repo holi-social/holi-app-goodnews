@@ -1,17 +1,22 @@
 import setupLogging from "./logging.ts";
-import { startServer } from "./server.ts";
+import { ServerConfig, startServer } from "./server.ts";
 
 setupLogging(Deno.env.get("ENVIRONMENT") || "development");
 
-const serverConfigFromEnv = () => {
+const serverConfigFromEnv = (): ServerConfig => {
   const asNumber = (str?: string) => str ? Number(str) : undefined;
   const asBoolean = (str?: string) => str ? Boolean(str) : undefined;
   return {
     port: asNumber(Deno.env.get("PORT")),
     cacheEnabled: asBoolean(Deno.env.get("CACHE_ENABLED")),
-    cacheTtlMsBetterplace: asNumber(Deno.env.get("CACHE_TTL_MS_BETTERPLACE")),
-    cacheTtlMsPlaces: asNumber(Deno.env.get("CACHE_TTL_MS_PLACES")),
-    placesApiKey: Deno.env.get("PLACES_API_KEY"),
+    cacheTtlMs: asNumber(Deno.env.get("CACHE_TTL_MS")),
+    contentful: {
+      spaceId: Deno.env.get("CONTENTFUL_SPACE_ID"),
+      deliveryApiAccessToken: Deno.env.get(
+        "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN",
+      ),
+      environment: Deno.env.get("CONTENTFUL_ENVIRONMENT"),
+    },
   };
 };
 

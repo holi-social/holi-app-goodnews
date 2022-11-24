@@ -16,11 +16,19 @@ export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
 export const DEFAULT_CACHE_TTL_MS = 60_000;
 
+export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
+
+export interface ContentfulConfig {
+  spaceId?: string;
+  environment?: string; // default: master
+  deliveryApiAccessToken?: string;
+}
+
 export interface ServerConfig {
   port?: number; // default: 8002
   cacheEnabled?: boolean; // default: true
   cacheTtlMs?: number; // default: 60 seconds
-  contentfulApiKey?: string; // must be given in order for places calls to work
+  contentful: ContentfulConfig;
 }
 
 export const createGraphQLServer = (
