@@ -152,7 +152,7 @@ to execute the application in a local docker container.
 
 Afterwards you can access the graphql playground here:
 
-`http://localhost:8001/graphql`
+`http://localhost:8002/graphql`
 
 ## Continuous Integration and Deployment
 
@@ -174,7 +174,7 @@ if "you know what you're doing".
 
 | Environment Variable | Default Value | Description                     |
 | -------------------- | ------------- | ------------------------------- |
-| PORT                 | 8001          | the port to listen on           |
+| PORT                 | 8002          | the port to listen on           |
 | CACHE_ENABLED        | true          | wether or not to enable caching |
 | CACHE_TTL_MS         | 60 seconds    | time-to-live in ms              |
 | CONTENTFUL_API_KEY   | undefined     | GoodNews Contentful API key     |

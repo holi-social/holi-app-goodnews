@@ -1,7 +1,7 @@
 FROM denoland/deno:alpine-1.28.1
 
 # The port that your application listens to.
-EXPOSE 8001
+EXPOSE 8002
 
 # Prefer not to run as root.
 USER deno

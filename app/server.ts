@@ -12,12 +12,12 @@ const createResolvers = (_config: ServerConfig) => ({
   },
 });
 
-export const DEFAULT_PORT = 8001;
+export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
 export const DEFAULT_CACHE_TTL_MS = 60_000;
 
 export interface ServerConfig {
-  port?: number; // default: 8001
+  port?: number; // default: 8002
   cacheEnabled?: boolean; // default: true
   cacheTtlMs?: number; // default: 60 seconds
   contentfulApiKey?: string; // must be given in order for places calls to work
