@@ -12,7 +12,6 @@ resource "google_project_service" "service" {
   for_each = toset([
     "apikeys.googleapis.com",
     "endpoints.googleapis.com",
-    "places-backend.googleapis.com",
     "run.googleapis.com",
     "servicecontrol.googleapis.com",
     "servicemanagement.googleapis.com",
@@ -148,18 +147,4 @@ resource "google_cloud_run_service_iam_policy" "goodnews_api" {
   service  = google_cloud_run_service.goodnews_api.name
 
   policy_data = data.google_iam_policy.goodnews_api.policy_data
-}
-
-resource "google_apikeys_key" "deployment" {
-  display_name = "places-api-key-${local.environment_name}"
-  name         = "places-api-key-${local.environment_name}"
-  project      = data.terraform_remote_state.holi_infra_state.outputs.shared_project_id
-
-  restrictions {
-    api_targets {
-      service = "places-backend.googleapis.com"
-    }
-  }
-
-  depends_on = [google_project_service.service]
 }

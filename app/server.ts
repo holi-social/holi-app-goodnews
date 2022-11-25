@@ -1,14 +1,47 @@
 import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
+import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
+import { GoodNewsArticle } from "./api_types.ts";
+import { toGoodNewsArticle } from "./goodnews.ts";
+import { dummyData } from "./dummy_data.ts";
 
-const typeDefs = `
+const typeDefs = gql`
+    enum Category {
+        ANIMAL_RIGHTS
+        CLIMATE
+        DIGITIZATION
+        EDUCATION
+        GLOBAL_HEALTH
+        HUMAN_RIGHTS
+        SUSTAINABILITY
+    }
+    
+    type GoodNewsArticle {
+        # ISO 8601 date (YYYY-MM-DD)
+        date: String!
+        headline: String!
+        teaserText: String!
+        pictureUrl: String!
+        pictureCredit: String
+        articleUrl: String!
+        source: String!
+        sortKey: Int!
+        category: Category
+        language: String
+    }
+    
     type Query {
-        ping: String!
+        # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
+        articles(lastDate: String): [GoodNewsArticle]!
     }
 `;
 
+const fetchArticles = (_lastDate: string): Promise<GoodNewsArticle[]> => {
+  return Promise.all(dummyData.map(toGoodNewsArticle));
+};
+
 const createResolvers = (_config: ServerConfig) => ({
   Query: {
-    ping: () => "pong!",
+    articles: fetchArticles,
   },
 });
 
@@ -19,15 +52,15 @@ export const DEFAULT_CACHE_TTL_MS = 60_000;
 export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
 
 export interface ContentfulConfig {
-  spaceId?: string;
-  environment?: string; // default: master
-  deliveryApiAccessToken?: string;
+  spaceId: string;
+  environment: string; // default: master
+  deliveryApiAccessToken: string;
 }
 
 export interface ServerConfig {
-  port?: number; // default: 8002
-  cacheEnabled?: boolean; // default: true
-  cacheTtlMs?: number; // default: 60 seconds
+  port: number; // default: 8002
+  cacheEnabled: boolean; // default: true
+  cacheTtlMs: number; // default: 60 seconds
   contentful: ContentfulConfig;
 }
 
@@ -38,7 +71,7 @@ export const createGraphQLServer = (
     ? [useResponseCache({
       session: () => null, // global cache, shared by all users
       ttlPerSchemaCoordinate: {
-        "Query.ping": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
+        "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
       },
     })]
     : [];
