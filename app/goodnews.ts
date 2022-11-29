@@ -1,5 +1,5 @@
 import { GoodNewsArticle, GoodNewsCategory } from "./api_types.ts";
-import { dummyData } from "./dummy_data.ts";
+import { dummyItems } from "./dummy_data.ts";
 
 export interface ContentfulItemFields {
   datum: string;
@@ -91,7 +91,7 @@ const allowedLocales = ["de", "en"];
 export const fetchArticles = (
   // deno-lint-ignore no-explicit-any
   _parent: any,
-  parameters: { locale: string; _lastDate: string | undefined },
+  parameters: { locale: string; lastDate: string | undefined },
 ): Promise<GoodNewsArticle[]> => {
   // TODO implement language filtering
   // TODO consider using Date type
@@ -104,9 +104,17 @@ export const fetchArticles = (
       })`,
     );
   }
+  const itemsWithLocale = dummyItems.filter((item) =>
+    item.fields.language === parameters.locale
+  );
+  const selectDate = !parameters.lastDate
+    ? itemsWithLocale[0].fields.datum
+    : itemsWithLocale.find((item) =>
+      item.fields.datum.localeCompare(parameters.lastDate!) === -1
+    )?.fields.datum;
   return Promise.all(
-    dummyData
-      .filter((article) => article.fields.language === parameters.locale)
+    itemsWithLocale
+      .filter((item) => item.fields.datum === selectDate)
       .map(toGoodNewsArticle),
   );
 };

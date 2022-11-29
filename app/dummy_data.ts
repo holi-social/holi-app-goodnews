@@ -1,7 +1,7 @@
 import { ContentfulItem } from "./goodnews.ts";
 
 // generated using http --auth-type bearer --auth $CONTENTFUL_DELIVERY_API_ACCESS_TOKEN https://cdn.contentful.com/spaces/evvo9u5z5a9q/environments/master/entries\?skip\=0\&limit\=100 | jq '.items[]' | jq -s '.'
-export const dummyData: ContentfulItem[] = [
+export const dummyItems: ContentfulItem[] = [
   {
     "metadata": {
       "tags": [],
