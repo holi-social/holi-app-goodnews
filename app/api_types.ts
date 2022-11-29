@@ -20,3 +20,7 @@ export type GoodNewsArticle = {
   category: GoodNewsCategory | undefined;
   language: "de" | "en";
 };
+
+export type GoodNewsArticleQueryResponse = {
+  articles: GoodNewsArticle[];
+};

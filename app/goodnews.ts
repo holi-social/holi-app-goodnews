@@ -54,6 +54,9 @@ const resolveCategory = (
       return "SUSTAINABILITY";
     case undefined:
       return undefined;
+    default:
+      console.error(`Received unknown category "${fields.categoryID}"`);
+      return undefined;
   }
 };
 
@@ -89,28 +92,21 @@ export const toGoodNewsArticle = async (
 const allowedLocales = ["de", "en"];
 
 export const fetchArticles = (
-  // deno-lint-ignore no-explicit-any
-  _parent: any,
-  parameters: { locale: string; lastDate: string | undefined },
+  locale: string,
+  lastDate: string | undefined,
 ): Promise<GoodNewsArticle[]> => {
   // TODO implement language filtering
   // TODO consider using Date type
   //  from https://the-guild.dev/graphql/scalars/docs/scalars/date
   //  or https://the-guild.dev/graphql/scalars/docs/scalars/local-date
-  if (!allowedLocales.includes(parameters.locale)) {
-    throw new Error(
-      `Unknown locale "${parameters.locale}" (known locales: ${
-        allowedLocales.join(",")
-      })`,
-    );
-  }
+  const validatedLocale = allowedLocales.includes(locale) ? locale : "en";
   const itemsWithLocale = dummyItems.filter((item) =>
-    item.fields.language === parameters.locale
+    item.fields.language === validatedLocale
   );
-  const selectDate = !parameters.lastDate
+  const selectDate = !lastDate
     ? itemsWithLocale[0].fields.datum
     : itemsWithLocale.find((item) =>
-      item.fields.datum.localeCompare(parameters.lastDate!) === -1
+      item.fields.datum.localeCompare(lastDate!) === -1
     )?.fields.datum;
   return Promise.all(
     itemsWithLocale

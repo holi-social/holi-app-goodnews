@@ -1,6 +1,7 @@
 import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
 import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
 import { fetchArticles } from "./goodnews.ts";
+import { GoodNewsArticleQueryResponse } from "./api_types.ts";
 
 const typeDefs = gql`
     enum Category {
@@ -28,15 +29,27 @@ const typeDefs = gql`
         language: String
     }
 
+    type GoodNewsArticlesQueryResponse {
+        articles: [GoodNewsArticle]!
+    }
+
     type Query {
         # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
-        articles(locale: String!, lastDate: String): [GoodNewsArticle]!
+        articles(locale: String!, lastDate: String): GoodNewsArticlesQueryResponse
     }
 `;
 
+const executeArticlesQuery = async (
+  // deno-lint-ignore no-explicit-any
+  _parent: any,
+  parameters: { locale: string; lastDate: string | undefined },
+): Promise<GoodNewsArticleQueryResponse> => ({
+  articles: await fetchArticles(parameters.locale, parameters.lastDate),
+});
+
 const createResolvers = (_config: ServerConfig) => ({
   Query: {
-    articles: fetchArticles,
+    articles: executeArticlesQuery,
   },
 });
 
