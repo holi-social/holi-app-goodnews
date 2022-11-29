@@ -8,6 +8,7 @@ export type GoodNewsCategory =
   | "SUSTAINABILITY";
 
 export type GoodNewsArticle = {
+  id: string;
   date: string;
   headline: string;
   teaserText: string;

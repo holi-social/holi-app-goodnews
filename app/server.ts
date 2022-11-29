@@ -1,8 +1,6 @@
 import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
 import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
-import { GoodNewsArticle } from "./api_types.ts";
-import { toGoodNewsArticle } from "./goodnews.ts";
-import { dummyData } from "./dummy_data.ts";
+import { fetchArticles } from "./goodnews.ts";
 
 const typeDefs = gql`
     enum Category {
@@ -14,8 +12,9 @@ const typeDefs = gql`
         HUMAN_RIGHTS
         SUSTAINABILITY
     }
-    
+
     type GoodNewsArticle {
+        id: String!
         # ISO 8601 date (YYYY-MM-DD)
         date: String!
         headline: String!
@@ -28,16 +27,12 @@ const typeDefs = gql`
         category: Category
         language: String
     }
-    
+
     type Query {
         # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
-        articles(lastDate: String): [GoodNewsArticle]!
+        articles(locale: String!, lastDate: String): [GoodNewsArticle]!
     }
 `;
-
-const fetchArticles = (_lastDate: string): Promise<GoodNewsArticle[]> => {
-  return Promise.all(dummyData.map(toGoodNewsArticle));
-};
 
 const createResolvers = (_config: ServerConfig) => ({
   Query: {
