@@ -1,40 +1,13 @@
-import { GoodNewsArticle, GoodNewsCategory } from "./api_types.ts";
-import { dummyItems } from "./dummy_data.ts";
+import {log} from "./deps.ts";
+import {
+  GoodNewsArticle,
+  GoodNewsArticleQueryResponse,
+  GoodNewsCategory,
+} from "./api_types.ts";
+import {ContentfulConfig} from "./server.ts";
+import {ContentfulItem, ContentfulItemFields, ContentfulEntriesResponse } from "./contentful_types.ts"
 
-export interface ContentfulItemFields {
-  datum: string;
-  headline: string;
-  layout: string;
-  bildManuell:
-    | { sys: { type: string; linkType: "Asset"; id: string } }
-    | undefined;
-  bildSource: string | undefined;
-  photoCredit: string;
-  teaserText: string;
-  quelle: string;
-  articleUrl: string;
-  sortKey: number;
-  language: "de" | "en";
-  categoryID:
-    | "animal_rights"
-    | "climate"
-    | "digitization"
-    | "education"
-    | "global_health"
-    | "human_rights"
-    | "sustainability"
-    | undefined;
-}
-
-// only covers the fields we're interested in
-export type ContentfulItem = Record<string, unknown> & {
-  sys: Record<string, unknown> & {
-    id: string;
-  };
-  fields: ContentfulItemFields;
-};
-
-const resolveCategory = (
+export const resolveCategory = (
   fields: ContentfulItemFields,
 ): GoodNewsCategory | undefined => {
   switch (fields.categoryID) {
@@ -60,7 +33,7 @@ const resolveCategory = (
   }
 };
 
-const resolvePictureUrlFromAsset = (
+export const resolvePictureUrlFromAsset = (
   item: ContentfulItem,
 ): Promise<string> => {
   // TODO implement asset resolution
@@ -79,7 +52,7 @@ export const toGoodNewsArticle = async (
     date: item.fields.datum,
     headline: item.fields.headline,
     teaserText: item.fields.teaserText,
-    pictureUrl: await resolvePictureUrlFromAsset(item),
+    pictureUrl: await resolvePictureUrlFromAsset(item), // TODO have resolvers do this work
     pictureCredit: item.fields.photoCredit,
     articleUrl: item.fields.articleUrl,
     source: item.fields.quelle,
@@ -89,28 +62,46 @@ export const toGoodNewsArticle = async (
   };
 };
 
+export const toGoodNewsArticleQueryResponse =
+  (locale: string, lastDate: string | undefined) =>
+    async (
+      response: ContentfulEntriesResponse,
+    ): Promise<GoodNewsArticleQueryResponse> => {
+      return {
+        // TODO async can be removed once resolvers receive pictureUrls
+        articles: (await Promise.all(response.items.map(toGoodNewsArticle)))
+          .filter((article) => article.language === locale),
+      };
+    };
+
 const allowedLocales = ["de", "en"];
 
-export const fetchArticles = (
-  locale: string,
-  lastDate: string | undefined,
-): Promise<GoodNewsArticle[]> => {
-  // TODO implement language filtering
-  // TODO consider using Date type
-  //  from https://the-guild.dev/graphql/scalars/docs/scalars/date
-  //  or https://the-guild.dev/graphql/scalars/docs/scalars/local-date
-  const validatedLocale = allowedLocales.includes(locale) ? locale : "en";
-  const itemsWithLocale = dummyItems.filter((item) =>
-    item.fields.language === validatedLocale
-  );
-  const selectDate = !lastDate
-    ? itemsWithLocale[0].fields.datum
-    : itemsWithLocale.find((item) =>
-      item.fields.datum.localeCompare(lastDate!) === -1
-    )?.fields.datum;
-  return Promise.all(
-    itemsWithLocale
-      .filter((item) => item.fields.datum === selectDate)
-      .map(toGoodNewsArticle),
-  );
-};
+const BASE_URL = "https://cdn.contentful.com/spaces/";
+
+export const executeArticlesQuery = (config: ContentfulConfig) =>
+  (
+    // deno-lint-ignore no-explicit-any
+    _parent: any,
+    parameters: { locale: string; lastDate: string | undefined },
+  ): Promise<GoodNewsArticleQueryResponse> => {
+    // TODO consider using Date type
+    //  from https://the-guild.dev/graphql/scalars/docs/scalars/date
+    //  or https://the-guild.dev/graphql/scalars/docs/scalars/local-date
+
+    const validatedLocale = allowedLocales.includes(parameters.locale)
+      ? parameters.locale
+      : "en";
+    const url = new URL(`${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`);
+    url.searchParams.set('skip', '0')
+    url.searchParams.set('limit', '10')
+    log.debug(`fetching articles from ${url}`);
+    const start = Date.now();
+    return fetch(url, { headers: { 'Authentication': `Bearer ${config.deliveryApiAccessToken}}`}})
+      .then((result) => result.json())
+      .then(toGoodNewsArticleQueryResponse(validatedLocale, parameters.lastDate))
+      .then((result) => {
+        const duration = Date.now() - start;
+        log.debug(`  fetching articles took ${duration} ms`);
+        return result;
+      });
+  };
