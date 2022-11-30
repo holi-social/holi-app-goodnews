@@ -1,14 +1,55 @@
 import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
+import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
+import { fetchArticles } from "./goodnews.ts";
+import { GoodNewsArticleQueryResponse } from "./api_types.ts";
 
-const typeDefs = `
+const typeDefs = gql`
+    enum Category {
+        ANIMAL_RIGHTS
+        CLIMATE
+        DIGITIZATION
+        EDUCATION
+        GLOBAL_HEALTH
+        HUMAN_RIGHTS
+        SUSTAINABILITY
+    }
+
+    type GoodNewsArticle {
+        id: String!
+        # ISO 8601 date (YYYY-MM-DD)
+        date: String!
+        headline: String!
+        teaserText: String!
+        pictureUrl: String!
+        pictureCredit: String
+        articleUrl: String!
+        source: String!
+        sortKey: Int!
+        category: Category
+        language: String
+    }
+
+    type GoodNewsArticlesQueryResponse {
+        articles: [GoodNewsArticle]!
+    }
+
     type Query {
-        ping: String!
+        # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
+        articles(locale: String!, lastDate: String): GoodNewsArticlesQueryResponse
     }
 `;
 
+const executeArticlesQuery = async (
+  // deno-lint-ignore no-explicit-any
+  _parent: any,
+  parameters: { locale: string; lastDate: string | undefined },
+): Promise<GoodNewsArticleQueryResponse> => ({
+  articles: await fetchArticles(parameters.locale, parameters.lastDate),
+});
+
 const createResolvers = (_config: ServerConfig) => ({
   Query: {
-    ping: () => "pong!",
+    articles: executeArticlesQuery,
   },
 });
 
@@ -19,15 +60,15 @@ export const DEFAULT_CACHE_TTL_MS = 60_000;
 export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
 
 export interface ContentfulConfig {
-  spaceId?: string;
-  environment?: string; // default: master
-  deliveryApiAccessToken?: string;
+  spaceId: string;
+  environment: string; // default: master
+  deliveryApiAccessToken: string;
 }
 
 export interface ServerConfig {
-  port?: number; // default: 8002
-  cacheEnabled?: boolean; // default: true
-  cacheTtlMs?: number; // default: 60 seconds
+  port: number; // default: 8002
+  cacheEnabled: boolean; // default: true
+  cacheTtlMs: number; // default: 60 seconds
   contentful: ContentfulConfig;
 }
 
@@ -38,7 +79,7 @@ export const createGraphQLServer = (
     ? [useResponseCache({
       session: () => null, // global cache, shared by all users
       ttlPerSchemaCoordinate: {
-        "Query.ping": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
+        "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
       },
     })]
     : [];
