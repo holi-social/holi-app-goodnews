@@ -1,11 +1,16 @@
-import {log} from "./deps.ts";
+import { log } from "./deps.ts";
 import {
   GoodNewsArticle,
   GoodNewsArticleQueryResponse,
   GoodNewsCategory,
 } from "./api_types.ts";
-import {ContentfulConfig} from "./server.ts";
-import {ContentfulItem, ContentfulItemFields, ContentfulEntriesResponse } from "./contentful_types.ts"
+import { ContentfulConfig } from "./server.ts";
+import {
+  ContentfulAsset,
+  ContentfulEntriesResponse,
+  ContentfulItem,
+  ContentfulItemFields,
+} from "./contentful_types.ts";
 
 export const resolveCategory = (
   fields: ContentfulItemFields,
@@ -28,31 +33,32 @@ export const resolveCategory = (
     case undefined:
       return undefined;
     default:
-      console.error(`Received unknown category "${fields.categoryID}"`);
+      log.error(`Received unknown category "${fields.categoryID}"`);
       return undefined;
   }
 };
 
-export const resolvePictureUrlFromAsset = (
+export const resolvePictureUrlFromAssets = (
   item: ContentfulItem,
-): Promise<string> => {
-  // TODO implement asset resolution
-  return item.fields.bildSource
-    ? Promise.resolve(item.fields.bildSource)
-    : Promise.resolve(
-      `https://www.motherjones.com/wp-content/uploads/2022/05/hawkesbay.jpg?${item.sys.id}`,
-    );
+  assets: ContentfulAsset[],
+): string | undefined => {
+  const asset = assets.find((asset) =>
+    asset.sys.id === item.fields.bildManuell.sys.id
+  );
+  return "https:" + asset?.fields.file.url;
 };
 
-export const toGoodNewsArticle = async (
+export const toGoodNewsArticle = (
   item: ContentfulItem,
-): Promise<GoodNewsArticle> => {
+  assets: ContentfulAsset[],
+): GoodNewsArticle => {
   return {
     id: item.sys.id,
     date: item.fields.datum,
     headline: item.fields.headline,
     teaserText: item.fields.teaserText,
-    pictureUrl: await resolvePictureUrlFromAsset(item), // TODO have resolvers do this work
+    pictureUrl: item.fields.bildSource ||
+      resolvePictureUrlFromAssets(item, assets),
     pictureCredit: item.fields.photoCredit,
     articleUrl: item.fields.articleUrl,
     source: item.fields.quelle,
@@ -62,46 +68,76 @@ export const toGoodNewsArticle = async (
   };
 };
 
-export const toGoodNewsArticleQueryResponse =
-  (locale: string, lastDate: string | undefined) =>
-    async (
-      response: ContentfulEntriesResponse,
-    ): Promise<GoodNewsArticleQueryResponse> => {
-      return {
-        // TODO async can be removed once resolvers receive pictureUrls
-        articles: (await Promise.all(response.items.map(toGoodNewsArticle)))
-          .filter((article) => article.language === locale),
-      };
-    };
-
 const allowedLocales = ["de", "en"];
 
-const BASE_URL = "https://cdn.contentful.com/spaces/";
+const BASE_URL = "https://cdn.contentful.com/spaces";
 
-export const executeArticlesQuery = (config: ContentfulConfig) =>
-  (
-    // deno-lint-ignore no-explicit-any
-    _parent: any,
-    parameters: { locale: string; lastDate: string | undefined },
-  ): Promise<GoodNewsArticleQueryResponse> => {
-    // TODO consider using Date type
-    //  from https://the-guild.dev/graphql/scalars/docs/scalars/date
-    //  or https://the-guild.dev/graphql/scalars/docs/scalars/local-date
+const fetchPage =
+  (config: ContentfulConfig) =>
+  (skip: number, limit: number): Promise<ContentfulEntriesResponse> => {
+    const url = new URL(
+      `${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`,
+    );
+    url.searchParams.set("skip", skip.toString());
+    url.searchParams.set("limit", limit.toString());
+    url.searchParams.set("access_token", config.deliveryApiAccessToken);
 
-    const validatedLocale = allowedLocales.includes(parameters.locale)
-      ? parameters.locale
-      : "en";
-    const url = new URL(`${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`);
-    url.searchParams.set('skip', '0')
-    url.searchParams.set('limit', '10')
-    log.debug(`fetching articles from ${url}`);
+    log.debug(`fetching articles ${skip} to ${skip + limit} from ${url}`);
     const start = Date.now();
-    return fetch(url, { headers: { 'Authentication': `Bearer ${config.deliveryApiAccessToken}}`}})
+    return fetch(url)
       .then((result) => result.json())
-      .then(toGoodNewsArticleQueryResponse(validatedLocale, parameters.lastDate))
       .then((result) => {
         const duration = Date.now() - start;
         log.debug(`  fetching articles took ${duration} ms`);
         return result;
       });
   };
+
+const olderThan = (date: string) => (item: ContentfulItem) =>
+  item.fields.datum.localeCompare(date) === -1;
+
+export const executeArticlesQuery = (config: ContentfulConfig) =>
+async (
+  // deno-lint-ignore no-explicit-any
+  _parent: any,
+  parameters: { locale: string; lastDate: string | undefined },
+): Promise<GoodNewsArticleQueryResponse> => {
+  const validatedLocale = allowedLocales.includes(parameters.locale)
+    ? parameters.locale
+    : "en";
+
+  let responseDate: string | undefined = undefined;
+  const responseItems: ContentfulItem[] = [];
+  const responseAssets: ContentfulAsset[] = [];
+  let skip = 0;
+  const limit = config.pageSize;
+  let fetchMore = true;
+  while (fetchMore) {
+    const contentfulResponse = await fetchPage(config)(skip, limit);
+    responseItems.push(...contentfulResponse.items);
+    responseAssets.push(...contentfulResponse.includes.Asset);
+    if (parameters.lastDate && !responseDate) {
+      responseDate =
+        responseItems.find(olderThan(parameters.lastDate))?.fields.datum;
+    } else if (!responseDate) {
+      responseDate = responseItems[0].fields.datum;
+    }
+    if (responseDate && responseItems.find(olderThan(responseDate!))) {
+      fetchMore = false;
+      // TODO add olderItem as preview
+    }
+    skip = skip + limit;
+  }
+
+  const responseArticles: GoodNewsArticle[] = responseItems
+    .filter((item) =>
+      item.fields.datum === responseDate &&
+      item.fields.language === validatedLocale
+    )
+    .map((item) => toGoodNewsArticle(item, responseAssets))
+    .sort((a, b) => a.sortKey - b.sortKey);
+
+  return {
+    articles: responseArticles,
+  };
+};

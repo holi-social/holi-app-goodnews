@@ -1,7 +1,8 @@
 export {
   afterEach,
+  beforeEach,
   describe,
-  it
+  it,
 } from "https://deno.land/std@0.165.0/testing/bdd.ts";
 
 export {
@@ -17,4 +18,4 @@ export {
   stub,
 } from "https://deno.land/std@0.165.0/testing/mock.ts";
 
-export type {Stub} from "https://deno.land/std@0.155.0/testing/mock.ts";
+export type { Stub } from "https://deno.land/std@0.155.0/testing/mock.ts";

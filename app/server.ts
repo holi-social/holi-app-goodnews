@@ -1,7 +1,6 @@
 import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
 import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
-import { executeArticlesQuery, fetchArticles } from "./goodnews.ts";
-import { GoodNewsArticleQueryResponse } from "./api_types.ts";
+import { executeArticlesQuery } from "./goodnews.ts";
 
 const typeDefs = gql`
     enum Category {
@@ -48,6 +47,7 @@ const createResolvers = (config: ContentfulConfig) => ({
 export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
 export const DEFAULT_CACHE_TTL_MS = 60_000;
+export const DEFAULT_PAGE_SIZE = 10;
 
 export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
 
@@ -55,6 +55,7 @@ export interface ContentfulConfig {
   spaceId: string;
   environment: string; // default: master
   deliveryApiAccessToken: string;
+  pageSize: number;
 }
 
 export interface ServerConfig {
@@ -75,7 +76,7 @@ export const createGraphQLServer = (
       },
     })]
     : [];
-  const resolvers = createResolvers(config);
+  const resolvers = createResolvers(config.contentful);
   return createYoga({
     schema: createSchema({ resolvers, typeDefs }),
     graphiql: true,
@@ -89,6 +90,7 @@ export type GraphQLServer = any;
 export const startServer = (
   config: ServerConfig,
 ): Promise<void> => {
+  console.debug(config);
   const graphQLServer: GraphQLServer = createGraphQLServer(config);
   return serve(graphQLServer.handleRequest, {
     port: config.port || DEFAULT_PORT,

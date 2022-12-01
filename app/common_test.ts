@@ -1,4 +1,4 @@
-import {returnsNext, stub} from "./dev_deps.ts";
+import { returnsNext, stub } from "./dev_deps.ts";
 
 export type ResponsePayload = Record<string, unknown> | Error;
 
@@ -26,6 +26,13 @@ export const stubFetchByUrlPrefix = (
         }
       }
     }
-    throw Promise.reject(new Error(`Unexpected request URL "${url}"`));
+    const prefixes = Object.keys(responses);
+    throw Promise.reject(
+      new Error(
+        `Unexpected request URL "${url}", expected prefixes are:\n  ${
+          prefixes.join("\n  ")
+        }`,
+      ),
+    );
   });
 };
