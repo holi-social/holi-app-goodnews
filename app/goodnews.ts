@@ -85,14 +85,17 @@ const BASE_URL = "https://cdn.contentful.com/spaces";
 const fetchPage =
   (config: ContentfulConfig) =>
   (skip: number, limit: number): Promise<ContentfulEntriesResponse> => {
-    const url = new URL(
-      `${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`,
-    );
+    // baseUrl used for logging to not leak access_token
+    const baseUrl =
+      `${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`;
+    const url = new URL(baseUrl);
+
     url.searchParams.set("skip", skip.toString());
     url.searchParams.set("limit", limit.toString());
     url.searchParams.set("access_token", config.deliveryApiAccessToken);
 
-    log.debug(`fetching articles ${skip} to ${skip + limit} from ${url}`);
+    log.debug(`fetching articles ${skip} to ${skip + limit} from ${baseUrl}`);
+
     const start = Date.now();
     return fetch(url)
       .then((result) => result.json())
@@ -123,7 +126,7 @@ async (
     parameters.locale === "de" || parameters.locale === "en"
       ? parameters.locale
       : "en";
-  let responseDate: string | undefined = undefined;
+  let responseDate: string | undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
   let skip = 0;
