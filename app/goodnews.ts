@@ -9,6 +9,7 @@ import {
   ContentfulAsset,
   ContentfulEntriesResponse,
   ContentfulItem,
+  ContentfulItemBildManuell,
   ContentfulItemFields,
   ContentfulLanguage,
 } from "./contentful_types.ts";
@@ -42,11 +43,22 @@ export const resolveCategory = (
 export const resolvePictureUrlFromAssets = (
   item: ContentfulItem,
   assets: ContentfulAsset[],
-): string | undefined => {
-  const asset = assets.find((asset) =>
-    asset.sys.id === item.fields.bildManuell.sys.id
-  );
+): string => {
+  const asset = assets.find((asset) => {
+    return asset.sys.id ===
+      (item.fields.bildManuell as ContentfulItemBildManuell).sys.id;
+  });
   return "https:" + asset?.fields.file.url;
+};
+
+export const resolvePictureUrl = (
+  item: ContentfulItem,
+  assets: ContentfulAsset[],
+): string => {
+  if ("bildSource" in item.fields) return (item.fields.bildSource as string);
+  else if ("bildManuell" in item.fields) {
+    return resolvePictureUrlFromAssets(item, assets);
+  } else throw Error("Item missing both bildSource and bildManuell");
 };
 
 export const toGoodNewsArticle = (
@@ -58,8 +70,7 @@ export const toGoodNewsArticle = (
     date: item.fields.datum,
     headline: item.fields.headline,
     teaserText: item.fields.teaserText,
-    pictureUrl: item.fields.bildSource ||
-      resolvePictureUrlFromAssets(item, assets),
+    pictureUrl: resolvePictureUrl(item, assets),
     pictureCredit: item.fields.photoCredit,
     articleUrl: item.fields.articleUrl,
     source: item.fields.quelle,

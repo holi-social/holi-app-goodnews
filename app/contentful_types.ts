@@ -1,13 +1,15 @@
 export type ContentfulLanguage = "de" | "en";
 
-/** items contain either bildManuell OR bildSource but not both */
-export type ContentfulItemBild = {
-  bildManuell:
-    | { sys: { type: string; linkType: string; id: string } }
-    | undefined;
-} | {
-  bildSource: string | undefined;
+export type ContentfulItemBildSource = string;
+
+export type ContentfulItemBildManuell = {
+  sys: { type: string; linkType: string; id: string };
 };
+
+/** items contain either bildManuell OR bildSource but not both */
+export type ContentfulItemBild =
+  | { bildSource: ContentfulItemBildSource }
+  | { bildManuell: ContentfulItemBildManuell };
 
 export type ContentfulItemCategory = {
   categoryID:
@@ -22,6 +24,7 @@ export type ContentfulItemCategory = {
 };
 
 export type ContentfulItemFields =
+  & Record<string, unknown>
   & ContentfulItemCategory
   & ContentfulItemBild
   & {
@@ -37,12 +40,16 @@ export type ContentfulItemFields =
   };
 
 // only covers the fields we're interested in
-export type ContentfulItem = Record<string, unknown> & {
-  sys: Record<string, unknown> & {
-    id: string;
+export type ContentfulItem =
+  & Record<string, unknown>
+  & {
+    sys:
+      & Record<string, unknown>
+      & {
+        id: string;
+      };
+    fields: ContentfulItemFields;
   };
-  fields: ContentfulItemFields;
-};
 
 export type ContentfulAssetFields = {
   title: string;

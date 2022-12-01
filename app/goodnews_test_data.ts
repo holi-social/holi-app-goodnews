@@ -430,6 +430,7 @@ export const item6 = (
     "articleUrl": "https://donorbox.org/good-news-en",
     "sortKey": 7,
     "language": language,
+    "categoryID": undefined,
   },
 });
 
@@ -442,7 +443,7 @@ export const item7_bildManuell = {
     "id": "4DQZB6GeZutdteJSy07Mnt",
   },
 };
-export const item7_2022_11_29 = (
+export const item7 = (
   datum: string,
   language: ContentfulLanguage,
 ): ContentfulItem => ({
@@ -570,7 +571,7 @@ export const item9_bild: ContentfulItemBild = {
     },
   },
 };
-export const item9_2022_11_29 = (
+export const item9 = (
   datum: string,
   language: ContentfulLanguage,
 ): ContentfulItem => ({
@@ -620,6 +621,7 @@ export const item9_2022_11_29 = (
       "https://www.goodbuy.eu/collections/shaktimat?utm_medium=referral&utm_source=goodnewsapp&utm_campaign=goodnews-29.11.2022&utm_content=collection",
     "sortKey": 4,
     "language": language,
+    "categoryID": undefined,
   },
 });
 
