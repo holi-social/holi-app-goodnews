@@ -1,7 +1,12 @@
-import { createSchema, createYoga, serve, useResponseCache } from "./deps.ts";
-import { gql } from "https://deno.land/x/graphql_tag@0.0.1/mod.ts";
-import { fetchArticles } from "./goodnews.ts";
-import { GoodNewsArticleQueryResponse } from "./api_types.ts";
+import {
+  createSchema,
+  createYoga,
+  gql,
+  log,
+  serve,
+  useResponseCache,
+} from "./deps.ts";
+import { executeArticlesQuery } from "./goodnews.ts";
 
 const typeDefs = gql`
     enum Category {
@@ -39,23 +44,16 @@ const typeDefs = gql`
     }
 `;
 
-const executeArticlesQuery = async (
-  // deno-lint-ignore no-explicit-any
-  _parent: any,
-  parameters: { locale: string; lastDate: string | undefined },
-): Promise<GoodNewsArticleQueryResponse> => ({
-  articles: await fetchArticles(parameters.locale, parameters.lastDate),
-});
-
-const createResolvers = (_config: ServerConfig) => ({
+const createResolvers = (config: ContentfulConfig) => ({
   Query: {
-    articles: executeArticlesQuery,
+    articles: executeArticlesQuery(config),
   },
 });
 
 export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
 export const DEFAULT_CACHE_TTL_MS = 60_000;
+export const DEFAULT_PAGE_SIZE = 100;
 
 export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
 
@@ -63,6 +61,7 @@ export interface ContentfulConfig {
   spaceId: string;
   environment: string; // default: master
   deliveryApiAccessToken: string;
+  pageSize: number;
 }
 
 export interface ServerConfig {
@@ -83,7 +82,7 @@ export const createGraphQLServer = (
       },
     })]
     : [];
-  const resolvers = createResolvers(config);
+  const resolvers = createResolvers(config.contentful);
   return createYoga({
     schema: createSchema({ resolvers, typeDefs }),
     graphiql: true,
@@ -101,7 +100,7 @@ export const startServer = (
   return serve(graphQLServer.handleRequest, {
     port: config.port || DEFAULT_PORT,
     onListen({ port, hostname }) {
-      console.log(
+      log.info(
         `Server started at http://${
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,

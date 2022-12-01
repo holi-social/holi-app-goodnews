@@ -3,6 +3,7 @@ import {
   DEFAULT_CACHE_ENABLED,
   DEFAULT_CACHE_TTL_MS,
   DEFAULT_CONTENTFUL_ENVIRONMENT,
+  DEFAULT_PAGE_SIZE,
   DEFAULT_PORT,
   ServerConfig,
   startServer,
@@ -46,6 +47,7 @@ const serverConfigFromEnv = (): ServerConfig => {
         Deno.env.get("CONTENTFUL_ENVIRONMENT") ||
           DEFAULT_CONTENTFUL_ENVIRONMENT,
       ),
+      pageSize: DEFAULT_PAGE_SIZE,
     },
   };
 };
