@@ -2,6 +2,7 @@ import {
   ContentfulEntriesResponse,
   ContentfulItem,
   ContentfulItemBild,
+  ContentfulLanguage,
 } from "./contentful_types.ts";
 
 export const item0_id = "item0_id";
@@ -17,7 +18,7 @@ export const item0_articleUrl =
 export const item0_quelle = "ECOWATCH";
 export const item0 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -75,7 +76,7 @@ export const item1_bild: ContentfulItemBild = {
 };
 export const item1 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -142,7 +143,7 @@ export const item2_bild: ContentfulItemBild = {
 };
 export const item2 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -200,7 +201,7 @@ export const item3_bildSource =
   "https://images.unsplash.com/photo-1557425493-6f90ae4659fc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80";
 export const item3 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -260,7 +261,7 @@ export const item4_bild: ContentfulItemBild = {
 };
 export const item4 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -319,7 +320,7 @@ export const item5_bild: ContentfulItemBild = {
 };
 export const item5 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
   sortKey: number | undefined = undefined,
 ): ContentfulItem => ({
   "metadata": {
@@ -383,7 +384,7 @@ export const item6_bild: ContentfulItemBild = {
 };
 export const item6 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
 ): ContentfulItem => ({
   "metadata": {
     "tags": [],
@@ -443,7 +444,7 @@ export const item7_bildManuell = {
 };
 export const item7_2022_11_29 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
 ): ContentfulItem => ({
   "metadata": {
     "tags": [],
@@ -507,7 +508,7 @@ export const item8_bild: ContentfulItemBild = {
 };
 export const item8 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
 ): ContentfulItem => ({
   "metadata": {
     "tags": [],
@@ -571,7 +572,7 @@ export const item9_bild: ContentfulItemBild = {
 };
 export const item9_2022_11_29 = (
   datum: string,
-  language: "de" | "en",
+  language: ContentfulLanguage,
 ): ContentfulItem => ({
   "metadata": {
     "tags": [],

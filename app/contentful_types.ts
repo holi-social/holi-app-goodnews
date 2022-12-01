@@ -1,3 +1,5 @@
+export type ContentfulLanguage = "de" | "en";
+
 /** items contain either bildManuell OR bildSource but not both */
 export type ContentfulItemBild = {
   bildManuell:
@@ -31,7 +33,7 @@ export type ContentfulItemFields =
     quelle: string;
     articleUrl: string;
     sortKey: number;
-    language: "de" | "en";
+    language: ContentfulLanguage;
   };
 
 // only covers the fields we're interested in

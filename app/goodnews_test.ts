@@ -298,7 +298,7 @@ describe("goodnews", () => {
     });
   });
 
-  it("should filter out articles with a different language", () => {
+  it("should filter out articles with a different language (same language first in response)", () => {
     const config = mockConfig(2);
     return withMockedResponses(config, [
       {
@@ -322,6 +322,41 @@ describe("goodnews", () => {
 
       assertNotContains(result, item2_id);
       assertNotContains(result, item3_id);
+    });
+  });
+
+  it("should filter out articles with a different language (other language first in response)", () => {
+    const config = mockConfig(2);
+    return withMockedResponses(config, [
+      {
+        skip: 0,
+        limit: 2,
+        items: [item0("2022-11-29", "de"), item1("2022-11-29", "de")],
+      },
+      {
+        skip: 2,
+        limit: 2,
+        items: [item2("2022-11-29", "de"), item3("2022-11-29", "en")],
+      },
+      {
+        skip: 4,
+        limit: 2,
+        items: [item4("2022-11-29", "en"), item5("2022-11-28", "en")],
+      },
+    ], async () => {
+      const result = await executeArticlesQuery(config)(null, {
+        locale: "en",
+        lastDate: undefined,
+      });
+
+      assertNotContains(result, item0_id);
+      assertNotContains(result, item1_id);
+      assertNotContains(result, item2_id);
+
+      assertContains(result, item3_id);
+      assertContains(result, item4_id);
+
+      assertNotContains(result, item5_id);
     });
   });
 

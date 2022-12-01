@@ -10,6 +10,7 @@ import {
   ContentfulEntriesResponse,
   ContentfulItem,
   ContentfulItemFields,
+  ContentfulLanguage,
 } from "./contentful_types.ts";
 
 export const resolveCategory = (
@@ -68,8 +69,6 @@ export const toGoodNewsArticle = (
   };
 };
 
-const allowedLocales = ["de", "en"];
-
 const BASE_URL = "https://cdn.contentful.com/spaces";
 
 const fetchPage =
@@ -93,8 +92,15 @@ const fetchPage =
       });
   };
 
-const olderThan = (date: string) => (item: ContentfulItem) =>
-  item.fields.datum.localeCompare(date) === -1;
+type ContentfulItemFilter = (item: ContentfulItem) => boolean;
+
+const olderThan =
+  (date: string): ContentfulItemFilter => (item: ContentfulItem) =>
+    item.fields.datum.localeCompare(date) === -1;
+
+const sameLanguage =
+  (language: ContentfulLanguage): ContentfulItemFilter =>
+  (item: ContentfulItem) => item.fields.language === language;
 
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
@@ -102,10 +108,10 @@ async (
   _parent: any,
   parameters: { locale: string; lastDate: string | undefined },
 ): Promise<GoodNewsArticleQueryResponse> => {
-  const validatedLocale = allowedLocales.includes(parameters.locale)
-    ? parameters.locale
-    : "en";
-
+  const validatedLocale: ContentfulLanguage =
+    parameters.locale === "de" || parameters.locale === "en"
+      ? parameters.locale
+      : "en";
   let responseDate: string | undefined = undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
@@ -114,14 +120,20 @@ async (
   let fetchMore = true;
   while (fetchMore) {
     const contentfulResponse = await fetchPage(config)(skip, limit);
-    responseItems.push(...contentfulResponse.items);
+    responseItems.push(
+      ...contentfulResponse.items.filter(sameLanguage(validatedLocale)),
+    );
     responseAssets.push(...contentfulResponse.includes.Asset);
+
     if (parameters.lastDate && !responseDate) {
       responseDate =
         responseItems.find(olderThan(parameters.lastDate))?.fields.datum;
     } else if (!responseDate) {
-      responseDate = responseItems[0].fields.datum;
+      responseDate = responseItems.length
+        ? responseItems[0].fields.datum
+        : undefined;
     }
+
     if (responseDate && responseItems.find(olderThan(responseDate!))) {
       fetchMore = false;
       // TODO add olderItem as preview
