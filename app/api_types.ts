@@ -7,6 +7,10 @@ export type GoodNewsCategory =
   | "HUMAN_RIGHTS"
   | "SUSTAINABILITY";
 
+export type GoodNewsLanguage =
+  | "de"
+  | "en";
+
 export type GoodNewsArticle = {
   id: string;
   date: string;
@@ -18,7 +22,7 @@ export type GoodNewsArticle = {
   source: string;
   sortKey: number;
   category: GoodNewsCategory | undefined;
-  language: "de" | "en";
+  language: GoodNewsLanguage;
 };
 
 export type GoodNewsArticleQueryResponse = {
