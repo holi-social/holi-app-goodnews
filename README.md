@@ -15,7 +15,7 @@ The backend for handling GoodNews projects, including a GraphQL API for
     - [Tasks](#tasks)
     - [VS Code extension](#vs-code-extension)
   - [Local execution](#local-execution)
-    - [Env Vars](#env-vars)
+    - [Environment Variables](#environment-variables)
     - [Running](#running)
   - [Continuous Integration and Deployment](#continuous-integration-and-deployment)
     - [Skipping parts of CI](#skipping-parts-of-ci)
@@ -132,11 +132,16 @@ JetBrains IDEs.
 
 ## Local execution
 
-### Env Vars
+### Environment Variables
 
 If you haven't done so yet, please `cp .envrc.local.template .envrc.local`.
-Within `.envrc.local`, set the environment variables required for the service to
-run. The values can be found within passbolt.
+
+Then, within `.envrc.local`, set the environment variables required for the
+
+service to run. The values can be found within the passbolt entry "GoodNews -
+Contentful Delivery". The field description contains the values for
+`CONTENTFUL_SPACE_ID` and `CONTENTFUL_ENVIRONMENT`, the password field stores
+the value used fro `CONTENTFUL_DELIVERY_API_ACCESS_TOKEN`.
 
 ### Running
 
