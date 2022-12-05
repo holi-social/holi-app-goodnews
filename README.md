@@ -27,7 +27,7 @@ The backend for handling GoodNews projects, including a GraphQL API for
 
 ### Setup
 
-Install [`deno`](https://github.com/denoland/deno_install) in version 1.28.1.
+Install [`deno`](https://github.com/denoland/deno_install) in version 1.28.3.
 
 as well as [`Velociraptor`](https://velociraptor.run/docs/installation/).
 
