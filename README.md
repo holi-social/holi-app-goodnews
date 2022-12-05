@@ -15,6 +15,8 @@ The backend for handling GoodNews projects, including a GraphQL API for
     - [Tasks](#tasks)
     - [VS Code extension](#vs-code-extension)
   - [Local execution](#local-execution)
+    - [Env Vars](#env-vars)
+    - [Running](#running)
   - [Continuous Integration and Deployment](#continuous-integration-and-deployment)
     - [Skipping parts of CI](#skipping-parts-of-ci)
       - [noenv Branches](#noenv-branches)
@@ -129,6 +131,14 @@ JetBrains also offers a
 JetBrains IDEs.
 
 ## Local execution
+
+### Env Vars
+
+If you haven't done so yet, please `cp .envrc.local.template .envrc.local`.
+Within `.envrc.local`, set the environment variables required for the service to
+run. The values can be found within passbolt.
+
+### Running
 
 To watch for file changes during development, run
 
