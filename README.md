@@ -135,13 +135,10 @@ JetBrains IDEs.
 ### Environment Variables
 
 If you haven't done so yet, please `cp .envrc.local.template .envrc.local`.
-
 Then, within `.envrc.local`, set the environment variables required for the
-
-service to run. The values can be found within the passbolt entry "GoodNews -
-Contentful Delivery". The field description contains the values for
-`CONTENTFUL_SPACE_ID` and `CONTENTFUL_ENVIRONMENT`, the password field stores
-the value used fro `CONTENTFUL_DELIVERY_API_ACCESS_TOKEN`.
+service to run. Please see the [configuration section](#configuration) to learn
+about the possible environment values, their purpose and where to find the
+values.
 
 ### Running
 
@@ -187,11 +184,17 @@ if "you know what you're doing".
 
 ### Configuration
 
-| Environment Variable                 | Default Value | Description                                   |
-| ------------------------------------ | ------------- | --------------------------------------------- |
-| PORT                                 | 8002          | the port to listen on                         |
-| CACHE_ENABLED                        | true          | wether or not to enable caching               |
-| CACHE_TTL_MS                         | 60 seconds    | time-to-live in ms                            |
-| CONTENTFUL_SPACE_ID                  | undefined     | GoodNews Contentful Space ID                  |
-| CONTENTFUL_DELIVERY_API_ACCESS_TOKEN | undefined     | GoodNews Contentful Delivery API Access Token |
-| CONTENTFUL_ENVIRONMENT               | master        | GoodNews Contentful Environment               |
+| Environment Variable                 | Default Value | Description                                                                                  |
+| ------------------------------------ | ------------- | -------------------------------------------------------------------------------------------- |
+| PORT                                 | 8002          | the port to listen on                                                                        |
+| CACHE_ENABLED                        | true          | wether or not to enable caching                                                              |
+| CACHE_TTL_MS                         | 60 seconds    | time-to-live in ms                                                                           |
+| CONTENTFUL_SPACE_ID                  | undefined     | Contentful Space ID - identifies the GoodNews account on Contentful                          |
+| CONTENTFUL_DELIVERY_API_ACCESS_TOKEN | undefined     | Contentful Delivery API Access Token - needed to access the articles from the Contentful API |
+| CONTENTFUL_ENVIRONMENT               | master        | Contentful Environment - currently always "master"                                           |
+
+**For local execution**, the values can be found within the passbolt entry
+"GoodNews - Contentful Delivery". The passbolt entry field "description"
+contains the values for `CONTENTFUL_SPACE_ID` and `CONTENTFUL_ENVIRONMENT`, the
+"password" field stores the value used for
+`CONTENTFUL_DELIVERY_API_ACCESS_TOKEN`.
