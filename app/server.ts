@@ -28,7 +28,7 @@ const typeDefs = gql`
         pictureUrl: String!
         pictureCredit: String
         articleUrl: String!
-        source: String!
+        source: String
         sortKey: Int!
         category: Category
         language: String
