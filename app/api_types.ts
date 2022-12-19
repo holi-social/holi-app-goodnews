@@ -27,4 +27,5 @@ export type GoodNewsArticle = {
 
 export type GoodNewsArticleQueryResponse = {
   articles: GoodNewsArticle[];
+  previousDateTeaser: GoodNewsArticle | undefined;
 };

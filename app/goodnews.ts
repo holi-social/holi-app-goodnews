@@ -163,7 +163,17 @@ async (
     .map((item) => toGoodNewsArticle(item, responseAssets))
     .sort((a, b) => a.sortKey - b.sortKey);
 
+  const previousDateTeaser: GoodNewsArticle | undefined =
+    responseDate === undefined ? undefined : responseItems
+      .filter((item) =>
+        item.fields.datum < responseDate! &&
+        item.fields.language === validatedLocale
+      )
+      .map((item) => toGoodNewsArticle(item, responseAssets))
+      .sort((a, b) => a.sortKey - b.sortKey)[0];
+
   return {
     articles: responseArticles,
+    previousDateTeaser: previousDateTeaser,
   };
 };
