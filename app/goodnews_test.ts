@@ -1,4 +1,10 @@
-import { assert, assertEquals, describe, it } from "./dev_deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertExists,
+  describe,
+  it,
+} from "./dev_deps.ts";
 import {
   contentfulResponse,
   item0,
@@ -94,6 +100,23 @@ const assertNotContains = (
   );
 };
 
+const assertPreviousDateTeaser = (
+  result: GoodNewsArticleQueryResponse,
+  id: string,
+) => {
+  assertExists(
+    result.previousDateTeaser,
+    `previousDateTeaser is not contained in result but it should be`,
+  );
+  assertEquals(
+    result.previousDateTeaser!.id,
+    id,
+    `previousDateTeaser does not have expected ID "${id}" (actual ID: ${
+      result.previousDateTeaser!.id
+    }`,
+  );
+};
+
 describe("goodnews", () => {
   it("should fetch articles of one day when within the page", () => {
     const config = mockConfig(3);
@@ -129,6 +152,8 @@ describe("goodnews", () => {
       assertNotContains(result, item3_id);
       assertNotContains(result, item4_id);
       assertNotContains(result, item5_id);
+
+      assertPreviousDateTeaser(result, item2_id);
     });
   });
 
@@ -156,6 +181,8 @@ describe("goodnews", () => {
       assertContains(result, item2_id);
 
       assertNotContains(result, item3_id);
+
+      assertPreviousDateTeaser(result, item3_id);
     });
   });
 
@@ -194,6 +221,8 @@ describe("goodnews", () => {
       assertContains(result, item4_id);
 
       assertNotContains(result, item5_id);
+
+      assertPreviousDateTeaser(result, item5_id);
     });
   });
 
@@ -229,6 +258,8 @@ describe("goodnews", () => {
 
       assertNotContains(result, item4_id);
       assertNotContains(result, item5_id);
+
+      assertPreviousDateTeaser(result, item4_id);
     });
   });
 
@@ -264,6 +295,8 @@ describe("goodnews", () => {
       assertContains(result, item4_id);
 
       assertNotContains(result, item5_id);
+
+      assertPreviousDateTeaser(result, item5_id);
     });
   });
 
@@ -322,6 +355,8 @@ describe("goodnews", () => {
 
       assertNotContains(result, item2_id);
       assertNotContains(result, item3_id);
+
+      assertPreviousDateTeaser(result, item3_id);
     });
   });
 
@@ -357,6 +392,8 @@ describe("goodnews", () => {
       assertContains(result, item4_id);
 
       assertNotContains(result, item5_id);
+
+      assertPreviousDateTeaser(result, item5_id);
     });
   });
 
