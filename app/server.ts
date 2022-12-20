@@ -36,6 +36,7 @@ const typeDefs = gql`
 
     type GoodNewsArticlesQueryResponse {
         articles: [GoodNewsArticle]!
+        previousDateTeaser: GoodNewsArticle
     }
 
     type Query {
