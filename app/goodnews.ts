@@ -116,6 +116,9 @@ const sameLanguage =
   (language: ContentfulLanguage): ContentfulItemFilter =>
   (item: ContentfulItem) => item.fields.language === language;
 
+const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
+  a.fields.sortKey - b.fields.sortKey;
+
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
   // deno-lint-ignore no-explicit-any
@@ -137,6 +140,7 @@ async (
     responseItems.push(
       ...contentfulResponse.items.filter(sameLanguage(validatedLocale)),
     );
+    responseItems.sort(sortKeyComparator);
     responseAssets.push(...contentfulResponse.includes.Asset);
 
     if (parameters.lastDate && !responseDate) {
@@ -160,17 +164,16 @@ async (
       item.fields.datum === responseDate &&
       item.fields.language === validatedLocale
     )
-    .map((item) => toGoodNewsArticle(item, responseAssets))
-    .sort((a, b) => a.sortKey - b.sortKey);
+    .map((item) => toGoodNewsArticle(item, responseAssets));
 
-  const previousDateTeaser: GoodNewsArticle | undefined =
-    responseDate === undefined ? undefined : responseItems
+  const previousDateTeaser: GoodNewsArticle | undefined = !responseDate
+    ? undefined
+    : responseItems
       .filter((item) =>
         item.fields.datum < responseDate! &&
         item.fields.language === validatedLocale
       )
-      .map((item) => toGoodNewsArticle(item, responseAssets))
-      .sort((a, b) => a.sortKey - b.sortKey)[0];
+      .map((item) => toGoodNewsArticle(item, responseAssets))[0];
 
   return {
     articles: responseArticles,
