@@ -33,6 +33,8 @@ resource "google_cloud_run_service" "goodnews_api" {
   project  = data.terraform_remote_state.holi_infra_state.outputs.shared_project_id
   name     = random_id.main.hex
   location = "europe-north1" # finland, low CO2 emissions
+  # https://github.com/hashicorp/terraform-provider-google/issues/5898
+  autogenerate_revision_name = true
 
   template {
     spec {
@@ -47,19 +49,19 @@ resource "google_cloud_run_service" "goodnews_api" {
           value = local.environment
         }
         env {
-          name  = "CONTENTFUL_SPACE_ID"
+          name = "CONTENTFUL_SPACE_ID"
           value_from {
             secret_key_ref {
-              key = "latest"
+              key  = "latest"
               name = "GOODNEWS_CONTENTFUL_SPACE_ID"
             }
           }
         }
         env {
-          name  = "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"
+          name = "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"
           value_from {
             secret_key_ref {
-              key = "latest"
+              key  = "latest"
               name = "GOODNEWS_CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"
             }
           }
