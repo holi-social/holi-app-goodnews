@@ -41,7 +41,7 @@ const typeDefs = gql`
 
     type Query {
         # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
-        articles(locale: String!, lastDate: String): GoodNewsArticlesQueryResponse
+        articles(lastDate: String): GoodNewsArticlesQueryResponse
     }
 `;
 
@@ -88,11 +88,30 @@ export const createGraphQLServer = (
     schema: createSchema({ resolvers, typeDefs }),
     graphiql: true,
     plugins,
+    context: (context: GraphQLContext) => {
+      const language =
+        (context.params?.extensions?.headers || {})["accept-language"];
+      return {
+        ...context,
+        language,
+      };
+    },
   });
 };
 
 // deno-lint-ignore no-explicit-any
 export type GraphQLServer = any;
+
+export type GraphQLContext = {
+  params?: {
+    extensions?: {
+      headers?: {
+        [key: string]: string;
+      };
+    };
+  };
+  language?: string;
+};
 
 export const startServer = (
   config: ServerConfig,
