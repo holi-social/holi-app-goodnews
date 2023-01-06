@@ -123,9 +123,10 @@ const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
 const getLocaleForLanguage = (languages = ""): ContentfulLanguage =>
-  (languages.split(",").find((language) =>
-    SUPPORTED_LOCALES.includes(language)
-  ) || DEFAULT_LOCALE) as ContentfulLanguage;
+  (languages.split(",")
+    .map((language) => language.split("-")[0])
+    .find((language) => SUPPORTED_LOCALES.includes(language)) ||
+    DEFAULT_LOCALE) as ContentfulLanguage;
 
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
