@@ -140,9 +140,8 @@ describe("goodnews", () => {
         ],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       assertContains(result, item0_id);
@@ -171,9 +170,8 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "de"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       assertContains(result, item0_id);
@@ -209,9 +207,8 @@ describe("goodnews", () => {
       },
     ], async () => {
       const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
         lastDate: "2022-11-29",
-      });
+      }, { language: "de" });
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -246,9 +243,8 @@ describe("goodnews", () => {
       },
     ], async () => {
       const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
         lastDate: "2022-11-29",
-      });
+      }, { language: "de" });
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -283,9 +279,8 @@ describe("goodnews", () => {
       },
     ], async () => {
       const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
         lastDate: "2022-11-29",
-      });
+      }, { language: "de" });
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -320,9 +315,8 @@ describe("goodnews", () => {
       },
     ], async () => {
       const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
         lastDate: "2022-11-29",
-      });
+      }, { language: "de" });
 
       assertEquals(
         result.articles.map((article) => article.id),
@@ -345,9 +339,8 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "en"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       assertContains(result, item0_id);
@@ -379,9 +372,8 @@ describe("goodnews", () => {
         items: [item4("2022-11-29", "en"), item5("2022-11-28", "en")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "en",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "en",
       });
 
       assertNotContains(result, item0_id);
@@ -411,9 +403,8 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "en"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       const article = result.articles.find((article) =>
@@ -438,9 +429,8 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "de"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       const article = result.articles.find((article) =>
@@ -465,9 +455,8 @@ describe("goodnews", () => {
         items: [item1("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
-        locale: "de",
-        lastDate: undefined,
+      const result = await executeArticlesQuery(config)(null, {}, {
+        language: "de",
       });
 
       const article = result.articles.find((article) =>

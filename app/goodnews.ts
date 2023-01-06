@@ -4,7 +4,7 @@ import {
   GoodNewsArticleQueryResponse,
   GoodNewsCategory,
 } from "./api_types.ts";
-import { ContentfulConfig } from "./server.ts";
+import { ContentfulConfig, GraphQLContext } from "./server.ts";
 import {
   ContentfulAsset,
   ContentfulEntriesResponse,
@@ -13,6 +13,9 @@ import {
   ContentfulItemFields,
   ContentfulLanguage,
 } from "./contentful_types.ts";
+
+const SUPPORTED_LOCALES = ["en", "de"];
+const DEFAULT_LOCALE: ContentfulLanguage = "en";
 
 export const resolveCategory = (
   fields: ContentfulItemFields,
@@ -119,16 +122,20 @@ const sameLanguage =
 const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
+const getLocaleForLanguage = (languages = ""): ContentfulLanguage =>
+  (languages.split(",")
+    .map((language) => language.split("-")[0])
+    .find((language) => SUPPORTED_LOCALES.includes(language)) ||
+    DEFAULT_LOCALE) as ContentfulLanguage;
+
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
   // deno-lint-ignore no-explicit-any
   _parent: any,
-  parameters: { locale: string; lastDate: string | undefined },
+  parameters: { lastDate?: string },
+  context: GraphQLContext,
 ): Promise<GoodNewsArticleQueryResponse> => {
-  const validatedLocale: ContentfulLanguage =
-    parameters.locale === "de" || parameters.locale === "en"
-      ? parameters.locale
-      : "en";
+  const validatedLocale = getLocaleForLanguage(context.language);
   let responseDate: string | undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
@@ -154,7 +161,6 @@ async (
 
     if (responseDate && responseItems.find(olderThan(responseDate!))) {
       fetchMore = false;
-      // TODO add olderItem as preview
     }
     skip = skip + limit;
   }
