@@ -2,47 +2,47 @@ import {
   createSchema,
   createYoga,
   gql,
-  log,
   serve,
   useResponseCache,
 } from "./deps.ts";
 import { executeArticlesQuery } from "./goodnews.ts";
+import { logger } from "./logging.ts";
 
 const typeDefs = gql`
-    enum Category {
-        ANIMAL_RIGHTS
-        CLIMATE
-        DIGITIZATION
-        EDUCATION
-        GLOBAL_HEALTH
-        HUMAN_RIGHTS
-        SUSTAINABILITY
-    }
+  enum Category {
+    ANIMAL_RIGHTS
+    CLIMATE
+    DIGITIZATION
+    EDUCATION
+    GLOBAL_HEALTH
+    HUMAN_RIGHTS
+    SUSTAINABILITY
+  }
 
-    type GoodNewsArticle {
-        id: String!
-        # ISO 8601 date (YYYY-MM-DD)
-        date: String!
-        headline: String!
-        teaserText: String!
-        pictureUrl: String!
-        pictureCredit: String
-        articleUrl: String!
-        source: String
-        sortKey: Int!
-        category: Category
-        language: String
-    }
+  type GoodNewsArticle {
+    id: String!
+    # ISO 8601 date (YYYY-MM-DD)
+    date: String!
+    headline: String!
+    teaserText: String!
+    pictureUrl: String!
+    pictureCredit: String
+    articleUrl: String!
+    source: String
+    sortKey: Int!
+    category: Category
+    language: String
+  }
 
-    type GoodNewsArticlesQueryResponse {
-        articles: [GoodNewsArticle]!
-        previousDateTeaser: GoodNewsArticle
-    }
+  type GoodNewsArticlesQueryResponse {
+    articles: [GoodNewsArticle]!
+    previousDateTeaser: GoodNewsArticle
+  }
 
-    type Query {
-        # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
-        articles(lastDate: String): GoodNewsArticlesQueryResponse
-    }
+  type Query {
+    # returns the articles of the day, starting *after* lastDate (if given) or today (if not given)
+    articles(lastDate: String): GoodNewsArticlesQueryResponse
+  }
 `;
 
 const createResolvers = (config: ContentfulConfig) => ({
@@ -72,16 +72,16 @@ export interface ServerConfig {
   contentful: ContentfulConfig;
 }
 
-export const createGraphQLServer = (
-  config: ServerConfig,
-): GraphQLServer => {
-  const plugins = (config.cacheEnabled || DEFAULT_CACHE_ENABLED)
-    ? [useResponseCache({
-      session: () => null, // global cache, shared by all users
-      ttlPerSchemaCoordinate: {
-        "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
-      },
-    })]
+export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
+  const plugins = config.cacheEnabled || DEFAULT_CACHE_ENABLED
+    ? [
+      useResponseCache({
+        session: () => null, // global cache, shared by all users
+        ttlPerSchemaCoordinate: {
+          "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
+        },
+      }),
+    ]
     : [];
   const resolvers = createResolvers(config.contentful);
   return createYoga({
@@ -89,8 +89,9 @@ export const createGraphQLServer = (
     graphiql: true,
     plugins,
     context: (context: GraphQLContext) => {
-      const language =
-        (context.params?.extensions?.headers || {})["accept-language"];
+      const language = (context.params?.extensions?.headers || {})[
+        "accept-language"
+      ];
       return {
         ...context,
         language,
@@ -113,14 +114,12 @@ export type GraphQLContext = {
   language?: string;
 };
 
-export const startServer = (
-  config: ServerConfig,
-): Promise<void> => {
+export const startServer = (config: ServerConfig): Promise<void> => {
   const graphQLServer: GraphQLServer = createGraphQLServer(config);
   return serve(graphQLServer.handleRequest, {
     port: config.port || DEFAULT_PORT,
     onListen({ port, hostname }) {
-      log.info(
+      logger.info(
         `Server started at http://${
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,

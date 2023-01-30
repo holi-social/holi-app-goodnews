@@ -1,4 +1,3 @@
-import { log } from "./deps.ts";
 import {
   GoodNewsArticle,
   GoodNewsArticleQueryResponse,
@@ -13,6 +12,7 @@ import {
   ContentfulItemFields,
   ContentfulLanguage,
 } from "./contentful_types.ts";
+import { logger } from "./logging.ts";
 
 const SUPPORTED_LOCALES = ["en", "de"];
 const DEFAULT_LOCALE: ContentfulLanguage = "en";
@@ -38,7 +38,7 @@ export const resolveCategory = (
     case undefined:
       return undefined;
     default:
-      log.error(`Received unknown category "${fields.categoryID}"`);
+      logger.error(`Received unknown category "${fields.categoryID}"`);
       return undefined;
   }
 };
@@ -48,8 +48,10 @@ export const resolvePictureUrlFromAssets = (
   assets: ContentfulAsset[],
 ): string => {
   const asset = assets.find((asset) => {
-    return asset.sys.id ===
-      (item.fields.bildManuell as ContentfulItemBildManuell).sys.id;
+    return (
+      asset.sys.id ===
+        (item.fields.bildManuell as ContentfulItemBildManuell).sys.id
+    );
   });
   return "https:" + asset?.fields.file.url;
 };
@@ -58,7 +60,7 @@ export const resolvePictureUrl = (
   item: ContentfulItem,
   assets: ContentfulAsset[],
 ): string => {
-  if ("bildSource" in item.fields) return (item.fields.bildSource as string);
+  if ("bildSource" in item.fields) return item.fields.bildSource as string;
   else if ("bildManuell" in item.fields) {
     return resolvePictureUrlFromAssets(item, assets);
   } else throw Error("Item missing both bildSource and bildManuell");
@@ -97,14 +99,14 @@ const fetchPage =
     url.searchParams.set("limit", limit.toString());
     url.searchParams.set("access_token", config.deliveryApiAccessToken);
 
-    log.debug(`fetching articles ${skip} to ${skip + limit} from ${baseUrl}`);
+    logger.info(`fetching articles ${skip} to ${skip + limit} from ${baseUrl}`);
 
     const start = Date.now();
     return fetch(url)
       .then((result) => result.json())
       .then((result) => {
         const duration = Date.now() - start;
-        log.debug(`  fetching articles took ${duration} ms`);
+        logger.debug(`fetching articles took ${duration} ms`);
         return result;
       });
   };
@@ -123,7 +125,8 @@ const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
 const getLocaleForLanguage = (languages = ""): ContentfulLanguage =>
-  (languages.split(",")
+  (languages
+    .split(",")
     .map((language) => language.split("-")[0])
     .find((language) => SUPPORTED_LOCALES.includes(language)) ||
     DEFAULT_LOCALE) as ContentfulLanguage;
@@ -151,8 +154,8 @@ async (
     responseAssets.push(...contentfulResponse.includes.Asset);
 
     if (parameters.lastDate && !responseDate) {
-      responseDate =
-        responseItems.find(olderThan(parameters.lastDate))?.fields.datum;
+      responseDate = responseItems.find(olderThan(parameters.lastDate))
+        ?.fields.datum;
     } else if (!responseDate) {
       responseDate = responseItems.length
         ? responseItems[0].fields.datum
@@ -166,18 +169,20 @@ async (
   }
 
   const responseArticles: GoodNewsArticle[] = responseItems
-    .filter((item) =>
-      item.fields.datum === responseDate &&
-      item.fields.language === validatedLocale
+    .filter(
+      (item) =>
+        item.fields.datum === responseDate &&
+        item.fields.language === validatedLocale,
     )
     .map((item) => toGoodNewsArticle(item, responseAssets));
 
   const previousDateTeaser: GoodNewsArticle | undefined = !responseDate
     ? undefined
     : responseItems
-      .filter((item) =>
-        item.fields.datum < responseDate! &&
-        item.fields.language === validatedLocale
+      .filter(
+        (item) =>
+          item.fields.datum < responseDate! &&
+          item.fields.language === validatedLocale,
       )
       .map((item) => toGoodNewsArticle(item, responseAssets))[0];
 
