@@ -163,7 +163,6 @@ staging_e2e:
 production_deploy:
   extends: .deploy
   needs: ['build_docker']
-  when: manual
   allow_failure: false
   environment:
     name: production
