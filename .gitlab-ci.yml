@@ -121,7 +121,6 @@ review_destroy:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   dependencies: [] # explicitly disable artifact usage
-  before_script:
   script:
     - export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_CLOUD_SERVICE_ACCOUNT}
     # branch may have been deleted, so we clone and checkout main
