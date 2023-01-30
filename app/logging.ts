@@ -34,7 +34,7 @@ class Logger {
     const input = this.environment === "development"
       ? `${date} ${severity} ${message}`
       : JSON.stringify({
-        logName: "holi-app-goodnews",
+        environment: this.environment,
         severity,
         message,
         ...options,
