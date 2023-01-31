@@ -121,6 +121,22 @@ const sameLanguage =
   (language: ContentfulLanguage): ContentfulItemFilter =>
   (item: ContentfulItem) => item.fields.language === language;
 
+const containsMandatoryFields = (item: ContentfulItem) => {
+  const { fields } = item;
+
+  return (
+    !!fields.datum &&
+    !!fields.headline &&
+    !!fields.photoCredit &&
+    !!fields.teaserText &&
+    !!fields.quelle &&
+    !!fields.articleUrl &&
+    !!fields.language &&
+    !!fields.categoryID &&
+    typeof fields.sortKey === "number"
+  );
+};
+
 const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
@@ -148,7 +164,9 @@ async (
   while (fetchMore) {
     const contentfulResponse = await fetchPage(config)(skip, limit);
     responseItems.push(
-      ...contentfulResponse.items.filter(sameLanguage(validatedLocale)),
+      ...contentfulResponse.items
+        .filter(sameLanguage(validatedLocale))
+        .filter(containsMandatoryFields),
     );
     responseItems.sort(sortKeyComparator);
     responseAssets.push(...contentfulResponse.includes.Asset);
