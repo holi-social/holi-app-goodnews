@@ -40,16 +40,12 @@ export type ContentfulItemFields =
   };
 
 // only covers the fields we're interested in
-export type ContentfulItem =
-  & Record<string, unknown>
-  & {
-    sys:
-      & Record<string, unknown>
-      & {
-        id: string;
-      };
-    fields: ContentfulItemFields;
+export type ContentfulItem = Record<string, unknown> & {
+  sys: Record<string, unknown> & {
+    id: string;
   };
+  fields: ContentfulItemFields;
+};
 
 export type ContentfulAssetFields = {
   title: string;
