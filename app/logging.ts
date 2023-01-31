@@ -34,6 +34,8 @@ class Logger {
    * In other environments it should follow Google Cloud's Structured Logging formatting: https://cloud.google.com/logging/docs/structured-logging
    */
   log(severity: LogSeverity, message: string, options = {}) {
+    if (!shouldLogLevel(this.level, severity)) return;
+
     const date = new Date().toISOString();
     const input = this.environment === "development"
       ? `${date} ${severity} ${message}`
@@ -46,12 +48,10 @@ class Logger {
 
     switch (severity) {
       case LogSeverity.DEFAULT:
-        this.level === LogSeverity.DEFAULT && console.log(input);
+        console.log(input);
         break;
       case LogSeverity.DEBUG:
-        (this.level === LogSeverity.DEFAULT ||
-          this.level === LogSeverity.DEBUG) &&
-          console.debug(input);
+        console.debug(input);
         break;
       case LogSeverity.INFO:
       case LogSeverity.NOTICE:
@@ -80,5 +80,72 @@ class Logger {
     this.log(LogSeverity.ERROR, message, options);
   }
 }
+
+/**
+ * @param minLevel Minimum level to be logged
+ * @param level Current log's level to be checked
+ * @returns Boolean
+ */
+const shouldLogLevel = (minLevel: LogSeverity, level: LogSeverity) => {
+  switch (minLevel) {
+    case LogSeverity.DEFAULT:
+      return true;
+    case LogSeverity.DEBUG:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+        LogSeverity.ERROR,
+        LogSeverity.WARNING,
+        LogSeverity.NOTICE,
+        LogSeverity.INFO,
+        LogSeverity.DEBUG,
+      ].includes(level);
+    case LogSeverity.INFO:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+        LogSeverity.ERROR,
+        LogSeverity.WARNING,
+        LogSeverity.NOTICE,
+        LogSeverity.INFO,
+      ].includes(level);
+    case LogSeverity.NOTICE:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+        LogSeverity.ERROR,
+        LogSeverity.WARNING,
+        LogSeverity.NOTICE,
+      ].includes(level);
+    case LogSeverity.WARNING:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+        LogSeverity.ERROR,
+        LogSeverity.WARNING,
+      ].includes(level);
+    case LogSeverity.ERROR:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+        LogSeverity.ERROR,
+      ].includes(level);
+    case LogSeverity.CRITICAL:
+      return [
+        LogSeverity.EMERGENCY,
+        LogSeverity.ALERT,
+        LogSeverity.CRITICAL,
+      ].includes(level);
+    case LogSeverity.ALERT:
+      return [LogSeverity.EMERGENCY, LogSeverity.ALERT].includes(level);
+    case LogSeverity.EMERGENCY:
+      return [LogSeverity.EMERGENCY].includes(level);
+  }
+};
 
 export const logger = new Logger();
