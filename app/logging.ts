@@ -17,8 +17,12 @@ export enum LogSeverity {
 class Logger {
   environment = "development";
 
-  setUpLogger(environment: string) {
+  // minimum level to log
+  level = LogSeverity.DEFAULT;
+
+  setUpLogger(environment: string, level: LogSeverity) {
     this.environment = environment;
+    this.level = level;
   }
 
   /**
@@ -42,10 +46,12 @@ class Logger {
 
     switch (severity) {
       case LogSeverity.DEFAULT:
-        console.log(input);
+        this.level === LogSeverity.DEFAULT && console.log(input);
         break;
       case LogSeverity.DEBUG:
-        console.debug(input);
+        (this.level === LogSeverity.DEFAULT ||
+          this.level === LogSeverity.DEBUG) &&
+          console.debug(input);
         break;
       case LogSeverity.INFO:
       case LogSeverity.NOTICE:
