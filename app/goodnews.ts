@@ -121,6 +121,8 @@ const sameLanguage =
   (language: ContentfulLanguage): ContentfulItemFilter =>
   (item: ContentfulItem) => item.fields.language === language;
 
+const containsArticleUrl = (item: ContentfulItem) => !!item.fields.articleUrl;
+
 const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
@@ -148,7 +150,9 @@ async (
   while (fetchMore) {
     const contentfulResponse = await fetchPage(config)(skip, limit);
     responseItems.push(
-      ...contentfulResponse.items.filter(sameLanguage(validatedLocale)),
+      ...contentfulResponse.items
+        .filter(sameLanguage(validatedLocale))
+        .filter(containsArticleUrl),
     );
     responseItems.sort(sortKeyComparator);
     responseAssets.push(...contentfulResponse.includes.Asset);
