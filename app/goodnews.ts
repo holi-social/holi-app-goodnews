@@ -127,7 +127,6 @@ const containsMandatoryFields = (item: ContentfulItem) => {
   return (
     !!fields.datum &&
     !!fields.headline &&
-    !!fields.layout &&
     !!fields.photoCredit &&
     !!fields.teaserText &&
     !!fields.quelle &&
