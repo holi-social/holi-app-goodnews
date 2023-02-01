@@ -84,68 +84,23 @@ class Logger {
 /**
  * @param minLevel Minimum level to be logged
  * @param level Current log's level to be checked
- * @returns Boolean
+ * @returns Boolean, true if the current level is accepted and false if it is rejected by the minLevel
  */
 const shouldLogLevel = (minLevel: LogSeverity, level: LogSeverity) => {
-  switch (minLevel) {
-    case LogSeverity.DEFAULT:
-      return true;
-    case LogSeverity.DEBUG:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-        LogSeverity.ERROR,
-        LogSeverity.WARNING,
-        LogSeverity.NOTICE,
-        LogSeverity.INFO,
-        LogSeverity.DEBUG,
-      ].includes(level);
-    case LogSeverity.INFO:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-        LogSeverity.ERROR,
-        LogSeverity.WARNING,
-        LogSeverity.NOTICE,
-        LogSeverity.INFO,
-      ].includes(level);
-    case LogSeverity.NOTICE:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-        LogSeverity.ERROR,
-        LogSeverity.WARNING,
-        LogSeverity.NOTICE,
-      ].includes(level);
-    case LogSeverity.WARNING:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-        LogSeverity.ERROR,
-        LogSeverity.WARNING,
-      ].includes(level);
-    case LogSeverity.ERROR:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-        LogSeverity.ERROR,
-      ].includes(level);
-    case LogSeverity.CRITICAL:
-      return [
-        LogSeverity.EMERGENCY,
-        LogSeverity.ALERT,
-        LogSeverity.CRITICAL,
-      ].includes(level);
-    case LogSeverity.ALERT:
-      return [LogSeverity.EMERGENCY, LogSeverity.ALERT].includes(level);
-    case LogSeverity.EMERGENCY:
-      return [LogSeverity.EMERGENCY].includes(level);
-  }
+  const sortedLevels = [
+    LogSeverity.DEFAULT,
+    LogSeverity.DEBUG,
+    LogSeverity.INFO,
+    LogSeverity.NOTICE,
+    LogSeverity.WARNING,
+    LogSeverity.ERROR,
+    LogSeverity.CRITICAL,
+    LogSeverity.ALERT,
+    LogSeverity.EMERGENCY,
+  ];
+  const minLevelIndex = sortedLevels.indexOf(minLevel);
+  const currentLevelIndex = sortedLevels.indexOf(level);
+  return currentLevelIndex >= minLevelIndex;
 };
 
 export const logger = new Logger();
