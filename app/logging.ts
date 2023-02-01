@@ -11,6 +11,18 @@ export enum LogSeverity {
   EMERGENCY = "EMERGENCY",
 }
 
+const sortedLevels = [
+  LogSeverity.DEFAULT,
+  LogSeverity.DEBUG,
+  LogSeverity.INFO,
+  LogSeverity.NOTICE,
+  LogSeverity.WARNING,
+  LogSeverity.ERROR,
+  LogSeverity.CRITICAL,
+  LogSeverity.ALERT,
+  LogSeverity.EMERGENCY,
+];
+
 /**
  * The Logger class requires a setUpLogger method to be run during the app's initialization in order get the current environment.
  */
@@ -87,17 +99,6 @@ class Logger {
  * @returns Boolean, true if the current level is accepted and false if it is rejected by the minLevel
  */
 const shouldLogLevel = (minLevel: LogSeverity, level: LogSeverity) => {
-  const sortedLevels = [
-    LogSeverity.DEFAULT,
-    LogSeverity.DEBUG,
-    LogSeverity.INFO,
-    LogSeverity.NOTICE,
-    LogSeverity.WARNING,
-    LogSeverity.ERROR,
-    LogSeverity.CRITICAL,
-    LogSeverity.ALERT,
-    LogSeverity.EMERGENCY,
-  ];
   const minLevelIndex = sortedLevels.indexOf(minLevel);
   const currentLevelIndex = sortedLevels.indexOf(level);
   return currentLevelIndex >= minLevelIndex;
