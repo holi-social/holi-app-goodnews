@@ -47,6 +47,14 @@ resource "google_cloud_run_service" "goodnews_api" {
           value = local.environment
         }
         env {
+          name  = "CACHE_ENABLED"
+          value = local.cache_enabled
+        }
+        env {
+          name  = "CACHE_TTL_MS"
+          value = local.cache_ttl_ms
+        }
+        env {
           name = "CONTENTFUL_SPACE_ID"
           value_from {
             secret_key_ref {
