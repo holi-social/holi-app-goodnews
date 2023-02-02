@@ -48,11 +48,12 @@ resource "google_cloud_run_service" "goodnews_api" {
         }
         env {
           name  = "CACHE_ENABLED"
-          value = local.cache_enabled
+          value = "true"
         }
         env {
           name  = "CACHE_TTL_MS"
-          value = local.cache_ttl_ms
+          value = local.environment == "production" ? "43200000" : "60000"
+          # 12 hours for production, otherwise 1 minute
         }
         env {
           name = "CONTENTFUL_SPACE_ID"
