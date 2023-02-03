@@ -123,16 +123,12 @@ const sameLanguage =
 
 const containsMandatoryFields = (item: ContentfulItem) => {
   const { fields } = item;
-
   return (
     !!fields.datum &&
     !!fields.headline &&
-    !!fields.photoCredit &&
     !!fields.teaserText &&
-    !!fields.quelle &&
     !!fields.articleUrl &&
     !!fields.language &&
-    !!fields.categoryID &&
     typeof fields.sortKey === "number"
   );
 };
