@@ -9,7 +9,7 @@ locals {
 # goodnews api environments zone
 resource "google_dns_managed_zone" "goodnews_api_environments_zone" {
   project  = data.terraform_remote_state.holi_infra_state.outputs.shared_project_id
-  name     = "goodnews-api-environments-zone"
+  name     = "goodnews-api-holi-social-environments-zone"
   dns_name = local.goodnews_api_environments_zone_dns_name
 }
 
