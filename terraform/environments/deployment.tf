@@ -38,7 +38,7 @@ resource "google_cloud_run_service" "goodnews_api" {
     spec {
       service_account_name = data.terraform_remote_state.holi_goodnews_api_common_state.outputs.cloud_run_service_account_email
       containers {
-        image = "${data.terraform_remote_state.holi_infra_state.outputs.gcr_location}/holi-goodnews-api:${var.image_tag}"
+        image = "${data.terraform_remote_state.holi_infra_state.outputs.artifact_registry_location}/holi-goodnews-api:${var.image_tag}"
         ports {
           container_port = 8002
         }
@@ -123,21 +123,6 @@ resource "google_cloud_run_service" "goodnews_api" {
   }
 
   depends_on = [google_project_service.service]
-}
-
-resource "google_cloud_run_domain_mapping" "goodnews_api" {
-  project = google_cloud_run_service.goodnews_api.project
-  # location needs to be the same as the service's
-  location = google_cloud_run_service.goodnews_api.location
-  name     = local.project_holi_dns_name
-
-  metadata {
-    namespace = google_cloud_run_service.goodnews_api.project
-  }
-
-  spec {
-    route_name = google_cloud_run_service.goodnews_api.name
-  }
 }
 
 resource "google_cloud_run_domain_mapping" "holi_social_goodnews_api" {
