@@ -1,4 +1,5 @@
 import { returnsNext, stub } from "./dev_deps.ts";
+import { GraphQLServer } from "./server.ts";
 
 export type ResponsePayload = Record<string, unknown> | Error;
 
@@ -35,4 +36,30 @@ export const stubFetchByUrlPrefix = (
       ),
     );
   });
+};
+
+export const processGqlRequest = (
+  graphQLServer: GraphQLServer,
+  query: string,
+  variables: Record<string, unknown> = {},
+  headers: Record<string, unknown> = {},
+): Promise<Record<string, unknown> | undefined | null> => {
+  const request = new Request("http://localhost:8002/graphql", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "accept": "*/*",
+    },
+    body: JSON.stringify({
+      operationName: null,
+      variables: variables,
+      query: query,
+      extensions: { headers },
+    }),
+  });
+  return graphQLServer.handleRequest(request)
+    // deno-lint-ignore no-explicit-any
+    .then((response: any) => response.json())
+    // deno-lint-ignore no-explicit-any
+    .then((response: any) => response.data);
 };
