@@ -1,9 +1,11 @@
 import {
+  afterEach,
   assert,
   assertEquals,
   assertExists,
   describe,
   it,
+  Stub,
 } from "./dev_deps.ts";
 import {
   contentfulResponse,
@@ -28,9 +30,14 @@ import {
   item5_id,
 } from "./goodnews_test_data.ts";
 import { executeArticlesQuery } from "./goodnews.ts";
-import { ContentfulConfig } from "./server.ts";
-import { GoodNewsArticleQueryResponse } from "./api_types.ts";
-import { stubFetchByUrlPrefix } from "./common_test.ts";
+import {
+  ContentfulConfig,
+  createGraphQLServer,
+  GraphQLServer,
+  ServerConfig,
+} from "./server.ts";
+import { GoodNewsArticle, GoodNewsArticleQueryResponse } from "./api_types.ts";
+import { processGqlRequest, stubFetchByUrlPrefix } from "./common_test.ts";
 import {
   ContentfulEntriesResponse,
   ContentfulItem,
@@ -411,7 +418,7 @@ describe("goodnews", () => {
         article.id === item0_id
       );
       assert(article);
-      assertEquals(article.pictureUrl, item0_bildSource);
+      assertEquals(article?.pictureUrl, item0_bildSource);
     });
   });
 
@@ -437,7 +444,7 @@ describe("goodnews", () => {
         article.id === item2_id
       );
       assert(article);
-      assertEquals(article.pictureUrl, item2_bild_url);
+      assertEquals(article?.pictureUrl, item2_bild_url);
     });
   });
 
@@ -463,16 +470,113 @@ describe("goodnews", () => {
         article.id === item0_id
       );
       assert(article);
-      assertEquals(article.date, "2022-11-29");
-      assertEquals(article.headline, item0_headline);
-      assertEquals(article.teaserText, item0_teaserText);
-      assertEquals(article.pictureUrl, item0_bildSource);
-      assertEquals(article.pictureCredit, item0_photoCredit);
-      assertEquals(article.articleUrl, item0_articleUrl);
-      assertEquals(article.source, item0_quelle);
-      assertEquals(article.sortKey, 13);
-      assertEquals(article.category, "CLIMATE");
-      assertEquals(article.language, "de");
+      assertEquals(article?.date, "2022-11-29");
+      assertEquals(article?.headline, item0_headline);
+      assertEquals(article?.teaserText, item0_teaserText);
+      assertEquals(article?.pictureUrl, item0_bildSource);
+      assertEquals(article?.pictureCredit, item0_photoCredit);
+      assertEquals(article?.articleUrl, item0_articleUrl);
+      assertEquals(article?.source, item0_quelle);
+      assertEquals(article?.sortKey, 13);
+      assertEquals(article?.category, "CLIMATE");
+      assertEquals(article?.language, "de");
+    });
+  });
+});
+
+describe("GoodNews server", () => {
+  let fetchStub: Stub;
+  const contentfulConfig = mockConfig(2);
+  const config: ServerConfig = {
+    cacheEnabled: false,
+    port: 8002,
+    cacheTtlMs: 0,
+    contentful: contentfulConfig,
+  };
+  const responses = [
+    {
+      skip: 0,
+      limit: 2,
+      items: [item0("2022-11-29", "de"), item1("2022-11-29", "en")],
+    },
+    {
+      skip: 2,
+      limit: 2,
+      items: [item2("2022-11-28", "de"), item3("2022-11-28", "en")],
+    },
+  ];
+
+  interface TestGoodNewsResponse {
+    articles: Partial<GoodNewsArticle>[];
+    previousDateTeaser: Partial<GoodNewsArticle> | undefined;
+  }
+  const queryArticles = (
+    graphQLServer: GraphQLServer,
+    headers = {},
+  ): Promise<TestGoodNewsResponse> => {
+    const query = `
+  query Articles {
+    articles {
+      articles {
+        id
+        language
+      }
+      previousDateTeaser {
+        id
+        language
+      }
+    }
+  }`;
+    return processGqlRequest(graphQLServer, query, {}, headers).then(
+      (result) => result?.articles as TestGoodNewsResponse,
+    );
+  };
+
+  afterEach(() => {
+    fetchStub?.restore();
+  });
+
+  it("correctly extracts language from locale", () => {
+    return withMockedResponses(contentfulConfig, responses, async () => {
+      const graphQLServer = createGraphQLServer(config);
+      const result = await queryArticles(graphQLServer, {
+        "accept-language": "de-DE",
+      });
+
+      assertEquals(result, {
+        articles: [
+          {
+            id: item0_id,
+            language: "de",
+          },
+        ],
+        previousDateTeaser: {
+          id: item2_id,
+          language: "de",
+        },
+      });
+    });
+  });
+
+  it("uses correct language as default if requested language is not supported", () => {
+    return withMockedResponses(contentfulConfig, responses, async () => {
+      const graphQLServer = createGraphQLServer(config);
+      const result = await queryArticles(graphQLServer, {
+        "accept-language": "es",
+      });
+
+      assertEquals(result, {
+        articles: [
+          {
+            id: item1_id,
+            language: "en",
+          },
+        ],
+        previousDateTeaser: {
+          id: item3_id,
+          language: "en",
+        },
+      });
     });
   });
 });
