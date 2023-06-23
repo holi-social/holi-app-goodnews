@@ -14,8 +14,8 @@ import {
 } from "./contentful_types.ts";
 import { logger } from "./logging.ts";
 
-const SUPPORTED_LOCALES = ["en", "de"];
-const DEFAULT_LOCALE: ContentfulLanguage = "en";
+export const SUPPORTED_LANGUAGES = ["en", "de"];
+export const DEFAULT_LANGUAGE: ContentfulLanguage = "en";
 
 export const resolveCategory = (
   fields: ContentfulItemFields,
@@ -136,13 +136,6 @@ const containsMandatoryFields = (item: ContentfulItem) => {
 const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
   a.fields.sortKey - b.fields.sortKey;
 
-const getLocaleForLanguage = (languages = ""): ContentfulLanguage =>
-  (languages
-    .split(",")
-    .map((language) => language.split("-")[0])
-    .find((language) => SUPPORTED_LOCALES.includes(language)) ||
-    DEFAULT_LOCALE) as ContentfulLanguage;
-
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
   // deno-lint-ignore no-explicit-any
@@ -150,7 +143,7 @@ async (
   parameters: { lastDate?: string },
   context: GraphQLContext,
 ): Promise<GoodNewsArticleQueryResponse> => {
-  const validatedLocale = getLocaleForLanguage(context.language);
+  const validatedLocale = context.language as ContentfulLanguage;
   let responseDate: string | undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
