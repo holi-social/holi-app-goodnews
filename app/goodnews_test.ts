@@ -44,6 +44,7 @@ import {
 } from "./contentful_types.ts";
 
 const mockConfig = (pageSize: number): ContentfulConfig => ({
+  baseUrl: "https://test.com/spaces",
   spaceId: "testSpaceId",
   environment: "master",
   deliveryApiAccessToken: "testAccessToken",
@@ -62,7 +63,7 @@ const withMockedResponses = async (
   testFn: () => unknown,
 ) => {
   const urlFor = (skip: number, limit: number): string =>
-    `https://cdn.contentful.com/spaces/${config.spaceId}/environments/${config.environment}/entries?skip=${skip}&limit=${limit}&access_token=${config.deliveryApiAccessToken}`;
+    `https://test.com/spaces/${config.spaceId}/environments/${config.environment}/entries?skip=${skip}&limit=${limit}&access_token=${config.deliveryApiAccessToken}`;
 
   const responses: Record<string, ContentfulEntriesResponse> = pages.map(
     (page) => {

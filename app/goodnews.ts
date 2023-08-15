@@ -85,14 +85,12 @@ export const toGoodNewsArticle = (
   };
 };
 
-const BASE_URL = "https://cdn.contentful.com/spaces";
-
 const fetchPage =
   (config: ContentfulConfig) =>
   (skip: number, limit: number): Promise<ContentfulEntriesResponse> => {
     // baseUrl used for logging to not leak access_token
     const baseUrl =
-      `${BASE_URL}/${config.spaceId}/environments/${config.environment}/entries`;
+      `${config.baseUrl}/${config.spaceId}/environments/${config.environment}/entries`;
     const url = new URL(baseUrl);
 
     url.searchParams.set("skip", skip.toString());

@@ -71,6 +71,7 @@ export const DEFAULT_PAGE_SIZE = 100;
 export const DEFAULT_CONTENTFUL_ENVIRONMENT = "master";
 
 export interface ContentfulConfig {
+  baseUrl: string;
   spaceId: string;
   environment: string; // default: master
   deliveryApiAccessToken: string;

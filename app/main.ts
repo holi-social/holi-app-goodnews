@@ -37,6 +37,10 @@ const serverConfigFromEnv = (): ServerConfig => {
       asNumber(Deno.env.get("CACHE_TTL_MS")) || DEFAULT_CACHE_TTL_MS,
     ),
     contentful: {
+      baseUrl: required(
+        "CONTENTFUL_BASE_URL",
+        Deno.env.get("CONTENTFUL_BASE_URL"),
+      ),
       spaceId: required(
         "CONTENTFUL_SPACE_ID",
         Deno.env.get("CONTENTFUL_SPACE_ID"),

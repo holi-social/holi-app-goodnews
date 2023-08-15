@@ -131,7 +131,7 @@ export const item1 = (
 export const item2_id = "item2_id";
 export const item2_headline = "Fetal monitoring app for remote areas";
 export const item2_bild_url =
-  "https://images.ctfassets.net/evvo9u5z5a9q/2GlEQvbXVValp0jkqKZEqh/0271e2aadeb28bb559393bdd5c088b92/Screenshot__37_.png";
+  "https://images.test.com/evvo9u5z5a9q/2GlEQvbXVValp0jkqKZEqh/0271e2aadeb28bb559393bdd5c088b92/Screenshot__37_.png";
 export const item2_bild: ContentfulItemBild = {
   "bildManuell": {
     "sys": {
@@ -656,7 +656,7 @@ const asset_item2 = {
     "description": "",
     "file": {
       "url":
-        "//images.ctfassets.net/evvo9u5z5a9q/2GlEQvbXVValp0jkqKZEqh/0271e2aadeb28bb559393bdd5c088b92/Screenshot__37_.png",
+        "//images.test.com/evvo9u5z5a9q/2GlEQvbXVValp0jkqKZEqh/0271e2aadeb28bb559393bdd5c088b92/Screenshot__37_.png",
       "details": {
         "size": 3135141,
         "image": {
@@ -701,7 +701,7 @@ const asset_item6 = {
     "description": "",
     "file": {
       "url":
-        "//images.ctfassets.net/evvo9u5z5a9q/2ykn7DSH46uUg1TJc51iJ8/e5921073d184dfa6ca56555e1a220bc4/ryan-christodoulou-XvLLcF_mt7c-unsplash.jpg",
+        "//images.test.com/evvo9u5z5a9q/2ykn7DSH46uUg1TJc51iJ8/e5921073d184dfa6ca56555e1a220bc4/ryan-christodoulou-XvLLcF_mt7c-unsplash.jpg",
       "details": {
         "size": 364507,
         "image": {
@@ -746,7 +746,7 @@ const asset_item9 = {
     "description": "",
     "file": {
       "url":
-        "//images.ctfassets.net/evvo9u5z5a9q/3q1EpSvM7Db1h8nclZdI0u/a329363446885437794e8be4aad4d288/24.png",
+        "//images.test.com/evvo9u5z5a9q/3q1EpSvM7Db1h8nclZdI0u/a329363446885437794e8be4aad4d288/24.png",
       "details": {
         "size": 1747534,
         "image": {
@@ -791,7 +791,7 @@ const asset_item7 = {
     "description": "",
     "file": {
       "url":
-        "//images.ctfassets.net/evvo9u5z5a9q/4DQZB6GeZutdteJSy07Mnt/33cdadcac7a4458f6edd8f5dd42d9328/2.png",
+        "//images.test.com/evvo9u5z5a9q/4DQZB6GeZutdteJSy07Mnt/33cdadcac7a4458f6edd8f5dd42d9328/2.png",
       "details": {
         "size": 1341043,
         "image": {
@@ -836,7 +836,7 @@ const asset_item8 = {
     "description": "",
     "file": {
       "url":
-        "//images.ctfassets.net/evvo9u5z5a9q/4EQK5W49r7UAZPMG3y15RV/c50b2637a37e769558a42d738281741c/3.png",
+        "//images.test.com/evvo9u5z5a9q/4EQK5W49r7UAZPMG3y15RV/c50b2637a37e769558a42d738281741c/3.png",
       "details": {
         "size": 1347111,
         "image": {

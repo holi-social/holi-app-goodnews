@@ -58,6 +58,15 @@ resource "google_cloud_run_service" "goodnews_api" {
           # 12 hours for production, otherwise 1 minute
         }
         env {
+          name = "CONTENTFUL_BASE_URL"
+          value_from {
+            secret_key_ref {
+              key  = "latest"
+              name = "GOODNEWS_CONTENTFUL_BASE_URL"
+            }
+          }
+        }
+        env {
           name = "CONTENTFUL_SPACE_ID"
           value_from {
             secret_key_ref {
