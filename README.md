@@ -196,6 +196,6 @@ if "you know what you're doing".
 
 **For local execution**, the values can be found within the passbolt entry
 "GoodNews - Contentful Delivery". The passbolt entry field "description"
-contains the values for `CONTENTFUL_SPACE_ID` and `CONTENTFUL_ENVIRONMENT`, the
-"password" field stores the value used for
+contains the values for `CONTENTFUL_SPACE_ID`, `CONTENTFUL_ENVIRONMENT`
+and `CONTENTFUL_BASE_URL`, the "password" field stores the value used for
 `CONTENTFUL_DELIVERY_API_ACCESS_TOKEN`.
