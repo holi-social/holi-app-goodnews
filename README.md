@@ -192,6 +192,7 @@ if "you know what you're doing".
 | CONTENTFUL_SPACE_ID                  | undefined     | Contentful Space ID - identifies the GoodNews account on Contentful                          |
 | CONTENTFUL_DELIVERY_API_ACCESS_TOKEN | undefined     | Contentful Delivery API Access Token - needed to access the articles from the Contentful API |
 | CONTENTFUL_ENVIRONMENT               | master        | Contentful Environment - currently always "master"                                           |
+| CONTENTFUL_BASE_URL                  |               | The Contentful URL to use                                                                    |
 
 **For local execution**, the values can be found within the passbolt entry
 "GoodNews - Contentful Delivery". The passbolt entry field "description"
