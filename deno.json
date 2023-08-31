@@ -19,10 +19,6 @@
     }
   },
   "fmt": {
-    "files": {
-      "exclude": [
-        "*.md"
-      ]
-    }
+    "exclude": ["*.md"]
   }
 }
