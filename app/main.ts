@@ -26,7 +26,7 @@ const serverConfigFromEnv = (): ServerConfig => {
   };
   const asNumber = (str?: string) => (str ? Number(str) : undefined);
   const asBoolean = (str?: string) => (str ? /^true$/i.test(str) : undefined);
-  const fake =  asBoolean(Deno.env.get("FAKE")) || false // For local development. If set, the API returns dummy data
+  const fake = asBoolean(Deno.env.get("FAKE")) || false // For local development. If set, the API returns dummy data
   return {
     port: required("PORT", asNumber(Deno.env.get("PORT")) || DEFAULT_PORT),
     cacheEnabled: required(
@@ -61,8 +61,8 @@ const serverConfigFromEnv = (): ServerConfig => {
         DEFAULT_CONTENTFUL_ENVIRONMENT,
       ),
       pageSize: DEFAULT_PAGE_SIZE,
-      fake
     },
+    fake,
   };
 };
 
