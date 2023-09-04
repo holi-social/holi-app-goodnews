@@ -52,7 +52,7 @@ const typeDefs = gql`
 
 const createResolvers = (config: ContentfulConfig) => ({
   Query: {
-    articles: executeArticlesQuery(config),
+    articles: config.fake ? Promise.resolve({articles: []}) : executeArticlesQuery(config),
   },
 });
 
@@ -76,6 +76,7 @@ export interface ContentfulConfig {
   environment: string; // default: master
   deliveryApiAccessToken: string;
   pageSize: number;
+  fake: boolean; // For local development. If set, the API returns dummy data
 }
 
 export interface ServerConfig {
@@ -83,6 +84,7 @@ export interface ServerConfig {
   cacheEnabled: boolean; // default: true
   cacheTtlMs: number; // default: 60 seconds
   contentful: ContentfulConfig;
+  fake: boolean; // default: false
 }
 
 export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
@@ -141,6 +143,9 @@ export const startServer = (config: ServerConfig): Promise<void> => {
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,
       );
+      if(config.fake) {
+        logger.info(`Server is serving fake data due to FAKE env var set to true`)
+      }
     },
   });
 };

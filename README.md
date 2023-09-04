@@ -189,6 +189,7 @@ if "you know what you're doing".
 | PORT                                 | 8002          | the port to listen on                                                                        |
 | CACHE_ENABLED                        | true          | wether or not to enable caching                                                              |
 | CACHE_TTL_MS                         | 60 seconds    | time-to-live in ms                                                                           |
+| CONTENTFUL_BASE_URL                  | undefined     | Contentful Base Url - defines the base url of the Contentful API                             |
 | CONTENTFUL_SPACE_ID                  | undefined     | Contentful Space ID - identifies the GoodNews account on Contentful                          |
 | CONTENTFUL_DELIVERY_API_ACCESS_TOKEN | undefined     | Contentful Delivery API Access Token - needed to access the articles from the Contentful API |
 | CONTENTFUL_ENVIRONMENT               | master        | Contentful Environment - currently always "master"                                           |
