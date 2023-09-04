@@ -61,6 +61,7 @@ const serverConfigFromEnv = (): ServerConfig => {
         DEFAULT_CONTENTFUL_ENVIRONMENT,
       ),
       pageSize: DEFAULT_PAGE_SIZE,
+      fake
     },
   };
 };
