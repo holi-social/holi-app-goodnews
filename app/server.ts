@@ -1,4 +1,8 @@
-import { GoodNewsLanguage } from "./api_types.ts";
+import {
+  GoodNewsArticle,
+  GoodNewsArticleQueryResponse,
+  GoodNewsLanguage,
+} from "./api_types.ts";
 import {
   createSchema,
   createYoga,
@@ -10,6 +14,7 @@ import {
   DEFAULT_LANGUAGE,
   executeArticlesQuery,
   SUPPORTED_LANGUAGES,
+  toGoodNewsArticle,
 } from "./goodnews.ts";
 import { logger } from "./logging.ts";
 
@@ -52,13 +57,20 @@ const typeDefs = gql`
 
 const createResolvers = (config: ContentfulConfig) => {
   return ({
-  
-  Query: {
-    articles: config.fake
-      ? Promise.resolve({ articles: [] })
-      : executeArticlesQuery(config),
-  },
-})};
+    Query: {
+      articles: (
+        // deno-lint-ignore no-explicit-any
+        _parent: any,
+        parameters: { lastDate?: string },
+        context: GraphQLContext,
+      ): Promise<GoodNewsArticleQueryResponse> => {
+        return config.fake
+          ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
+          : executeArticlesQuery(config)(parameters, context.language);
+      },
+    },
+  });
+};
 
 const getLanguage = (languages = "") =>
   languages

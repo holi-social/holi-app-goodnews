@@ -137,11 +137,9 @@ const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
   // deno-lint-ignore no-explicit-any
-  _parent: any,
   parameters: { lastDate?: string },
-  context: GraphQLContext,
+  validatedLocale: ContentfulLanguage,
 ): Promise<GoodNewsArticleQueryResponse> => {
-  const validatedLocale = context.language as ContentfulLanguage;
   let responseDate: string | undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
