@@ -50,13 +50,15 @@ const typeDefs = gql`
   }
 `;
 
-const createResolvers = (config: ContentfulConfig) => ({
+const createResolvers = (config: ContentfulConfig) => {
+  return ({
+  
   Query: {
     articles: config.fake
       ? Promise.resolve({ articles: [] })
       : executeArticlesQuery(config),
   },
-});
+})};
 
 const getLanguage = (languages = "") =>
   languages
@@ -86,7 +88,6 @@ export interface ServerConfig {
   cacheEnabled: boolean; // default: true
   cacheTtlMs: number; // default: 60 seconds
   contentful: ContentfulConfig;
-  fake: boolean; // default: false
 }
 
 export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
