@@ -26,7 +26,7 @@ const serverConfigFromEnv = (): ServerConfig => {
   };
   const asNumber = (str?: string) => (str ? Number(str) : undefined);
   const asBoolean = (str?: string) => (str ? /^true$/i.test(str) : undefined);
-  const fake = asBoolean(Deno.env.get("FAKE")) || false // For local development. If set, the API returns dummy data
+  const fake = asBoolean(Deno.env.get("FAKE")) || false; // For local development. If set, the API returns dummy data
   return {
     port: required("PORT", asNumber(Deno.env.get("PORT")) || DEFAULT_PORT),
     cacheEnabled: required(
@@ -37,23 +37,23 @@ const serverConfigFromEnv = (): ServerConfig => {
     cacheTtlMs: required(
       "CACHE_TTL_MS",
       asNumber(Deno.env.get("CACHE_TTL_MS")),
-      DEFAULT_CACHE_TTL_MS
+      DEFAULT_CACHE_TTL_MS,
     ),
     contentful: {
       baseUrl: required(
         "CONTENTFUL_BASE_URL",
         Deno.env.get("CONTENTFUL_BASE_URL"),
-        fake ? 'dummy value' : undefined
+        fake ? "dummy value" : undefined,
       ),
       spaceId: required(
         "CONTENTFUL_SPACE_ID",
         Deno.env.get("CONTENTFUL_SPACE_ID"),
-        fake ? 'dummy value' : undefined
+        fake ? "dummy value" : undefined,
       ),
       deliveryApiAccessToken: required(
         "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN",
         Deno.env.get("CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"),
-        fake ? 'dummy value' : undefined
+        fake ? "dummy value" : undefined,
       ),
       environment: required(
         "CONTENTFUL_ENVIRONMENT",

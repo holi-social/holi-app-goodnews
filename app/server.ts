@@ -52,7 +52,9 @@ const typeDefs = gql`
 
 const createResolvers = (config: ContentfulConfig) => ({
   Query: {
-    articles: config.fake ? Promise.resolve({articles: []}) : executeArticlesQuery(config),
+    articles: config.fake
+      ? Promise.resolve({ articles: [] })
+      : executeArticlesQuery(config),
   },
 });
 
@@ -142,9 +144,11 @@ export const startServer = (config: ServerConfig): Promise<void> => {
         `Server started at http://${
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,
-      )
-      if(config.fake) {
-        logger.info(`Server is serving fake data due to FAKE env var set to true`)
+      );
+      if (config.fake) {
+        logger.info(
+          `Server is serving fake data due to FAKE env var set to true`,
+        );
       }
     },
   });
