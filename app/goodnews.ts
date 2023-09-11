@@ -164,7 +164,6 @@ async (
         ? responseItems[0].fields.datum
         : undefined;
     }
-
     if (responseDate && responseItems.find(olderThan(responseDate!))) {
       fetchMore = false;
     }
