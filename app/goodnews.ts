@@ -3,7 +3,7 @@ import {
   GoodNewsArticleQueryResponse,
   GoodNewsCategory,
 } from "./api_types.ts";
-import { ContentfulConfig, GraphQLContext } from "./server.ts";
+import { ContentfulConfig } from "./server.ts";
 import {
   ContentfulAsset,
   ContentfulEntriesResponse,
@@ -136,7 +136,6 @@ const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
 
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
-  // deno-lint-ignore no-explicit-any
   parameters: { lastDate?: string },
   validatedLocale: ContentfulLanguage,
 ): Promise<GoodNewsArticleQueryResponse> => {

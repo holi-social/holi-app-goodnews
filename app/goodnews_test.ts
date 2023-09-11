@@ -41,7 +41,6 @@ import { processGqlRequest, stubFetchByUrlPrefix } from "./common_test.ts";
 import {
   ContentfulEntriesResponse,
   ContentfulItem,
-  ContentfulLanguage,
 } from "./contentful_types.ts";
 
 const mockConfig = (pageSize: number): ContentfulConfig => ({

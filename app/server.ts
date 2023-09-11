@@ -1,5 +1,4 @@
 import {
-  GoodNewsArticle,
   GoodNewsArticleQueryResponse,
   GoodNewsLanguage,
 } from "./api_types.ts";
@@ -14,7 +13,6 @@ import {
   DEFAULT_LANGUAGE,
   executeArticlesQuery,
   SUPPORTED_LANGUAGES,
-  toGoodNewsArticle,
 } from "./goodnews.ts";
 import { logger } from "./logging.ts";
 
