@@ -158,7 +158,7 @@ export const startServer = (config: ServerConfig): Promise<void> => {
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,
       );
-      if (config.fake) {
+      if (config.contentful.fake) {
         logger.info(
           `Server is serving fake data due to FAKE env var set to true`,
         );
