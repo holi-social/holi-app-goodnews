@@ -1,7 +1,4 @@
-import {
-  GoodNewsArticleQueryResponse,
-  GoodNewsLanguage,
-} from "./api_types.ts";
+import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from "./api_types.ts";
 import {
   createSchema,
   createYoga,
