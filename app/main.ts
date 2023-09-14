@@ -16,48 +16,54 @@ logger.setUpLogger(
   environment === "development" ? LogSeverity.DEFAULT : LogSeverity.INFO,
 );
 
+const requiredEnv = <T>(
+  name: string,
+  typeFn: (s: string) => T,
+  fallback?: T,
+): T => {
+  const env = Deno.env.get(name);
+  if (env === undefined && fallback === undefined) {
+    throw Error(`Environment variable "${name}" is required`);
+  } else {
+    return env !== undefined ? typeFn(env) : fallback!;
+  }
+};
+
+const asBoolean = (str: string) => /^true$/i.test(str);
+
 const serverConfigFromEnv = (): ServerConfig => {
-  const required = <T>(name: string, t?: T, fallback?: T): T => {
-    if (t === undefined && fallback === undefined) {
-      throw Error(`Environment variable "${name}" is required`);
-    } else {
-      return t !== undefined ? t : fallback!;
-    }
-  };
-  const asNumber = (str?: string) => (str ? Number(str) : undefined);
-  const asBoolean = (str?: string) => (str ? /^true$/i.test(str) : undefined);
-  const fake = asBoolean(Deno.env.get("FAKE")) || false; // For local development. If set, the API returns dummy data
+  const fake = requiredEnv("FAKE", asBoolean, false); // For local development. If set, the API returns dummy data
   return {
-    port: required("PORT", asNumber(Deno.env.get("PORT")) || DEFAULT_PORT),
-    cacheEnabled: required(
+    port: requiredEnv("PORT", Number, DEFAULT_PORT),
+    cacheEnabled: requiredEnv(
       "CACHE_ENABLED",
-      asBoolean(Deno.env.get("CACHE_ENABLED")),
+      asBoolean,
       DEFAULT_CACHE_ENABLED,
     ),
-    cacheTtlMs: required(
+    cacheTtlMs: requiredEnv(
       "CACHE_TTL_MS",
-      asNumber(Deno.env.get("CACHE_TTL_MS")),
+      Number,
       DEFAULT_CACHE_TTL_MS,
     ),
     contentful: {
-      baseUrl: required(
+      baseUrl: requiredEnv(
         "CONTENTFUL_BASE_URL",
-        Deno.env.get("CONTENTFUL_BASE_URL"),
+        String,
         fake ? "dummy value" : undefined,
       ),
-      spaceId: required(
+      spaceId: requiredEnv(
         "CONTENTFUL_SPACE_ID",
-        Deno.env.get("CONTENTFUL_SPACE_ID"),
+        String,
         fake ? "dummy value" : undefined,
       ),
-      deliveryApiAccessToken: required(
+      deliveryApiAccessToken: requiredEnv(
         "CONTENTFUL_DELIVERY_API_ACCESS_TOKEN",
-        Deno.env.get("CONTENTFUL_DELIVERY_API_ACCESS_TOKEN"),
+        String,
         fake ? "dummy value" : undefined,
       ),
-      environment: required(
+      environment: requiredEnv(
         "CONTENTFUL_ENVIRONMENT",
-        Deno.env.get("CONTENTFUL_ENVIRONMENT"),
+        String,
         DEFAULT_CONTENTFUL_ENVIRONMENT,
       ),
       pageSize: DEFAULT_PAGE_SIZE,
