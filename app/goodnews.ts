@@ -3,7 +3,7 @@ import {
   GoodNewsArticleQueryResponse,
   GoodNewsCategory,
 } from "./api_types.ts";
-import { ContentfulConfig, GraphQLContext } from "./server.ts";
+import { ContentfulConfig } from "./server.ts";
 import {
   ContentfulAsset,
   ContentfulEntriesResponse,
@@ -136,12 +136,9 @@ const sortKeyComparator = (a: ContentfulItem, b: ContentfulItem) =>
 
 export const executeArticlesQuery = (config: ContentfulConfig) =>
 async (
-  // deno-lint-ignore no-explicit-any
-  _parent: any,
   parameters: { lastDate?: string },
-  context: GraphQLContext,
+  validatedLocale: ContentfulLanguage,
 ): Promise<GoodNewsArticleQueryResponse> => {
-  const validatedLocale = context.language as ContentfulLanguage;
   let responseDate: string | undefined;
   const responseItems: ContentfulItem[] = [];
   const responseAssets: ContentfulAsset[] = [];
@@ -166,7 +163,6 @@ async (
         ? responseItems[0].fields.datum
         : undefined;
     }
-
     if (responseDate && responseItems.find(olderThan(responseDate!))) {
       fetchMore = false;
     }

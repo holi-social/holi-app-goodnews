@@ -49,6 +49,7 @@ const mockConfig = (pageSize: number): ContentfulConfig => ({
   environment: "master",
   deliveryApiAccessToken: "testAccessToken",
   pageSize,
+  fake: false,
 });
 
 type MockPage = {
@@ -148,9 +149,7 @@ describe("goodnews", () => {
         ],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       assertContains(result, item0_id);
       assertContains(result, item1_id);
@@ -178,9 +177,7 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "de"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       assertContains(result, item0_id);
       assertContains(result, item1_id);
@@ -214,9 +211,9 @@ describe("goodnews", () => {
         ],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
+      const result = await executeArticlesQuery(config)({
         lastDate: "2022-11-29",
-      }, { language: "de" });
+      }, "de");
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -250,9 +247,9 @@ describe("goodnews", () => {
         items: [item4("2022-11-27", "de"), item5("2022-11-27", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
+      const result = await executeArticlesQuery(config)({
         lastDate: "2022-11-29",
-      }, { language: "de" });
+      }, "de");
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -286,9 +283,9 @@ describe("goodnews", () => {
         items: [item4("2022-11-28", "de"), item5("2022-11-27", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
+      const result = await executeArticlesQuery(config)({
         lastDate: "2022-11-29",
-      }, { language: "de" });
+      }, "de");
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -322,9 +319,9 @@ describe("goodnews", () => {
         items: [item4("2022-11-28", "de", 1), item5("2022-11-27", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {
+      const result = await executeArticlesQuery(config)({
         lastDate: "2022-11-29",
-      }, { language: "de" });
+      }, "de");
 
       assertEquals(
         result.articles.map((article) => article.id),
@@ -347,9 +344,7 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "en"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       assertContains(result, item0_id);
       assertContains(result, item1_id);
@@ -380,9 +375,7 @@ describe("goodnews", () => {
         items: [item4("2022-11-29", "en"), item5("2022-11-28", "en")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "en",
-      });
+      const result = await executeArticlesQuery(config)({}, "en");
 
       assertNotContains(result, item0_id);
       assertNotContains(result, item1_id);
@@ -411,9 +404,7 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "en"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       const article = result.articles.find((article) =>
         article.id === item0_id
@@ -437,9 +428,7 @@ describe("goodnews", () => {
         items: [item2("2022-11-29", "de"), item3("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       const article = result.articles.find((article) =>
         article.id === item2_id
@@ -463,9 +452,7 @@ describe("goodnews", () => {
         items: [item1("2022-11-28", "de")],
       },
     ], async () => {
-      const result = await executeArticlesQuery(config)(null, {}, {
-        language: "de",
-      });
+      const result = await executeArticlesQuery(config)({}, "de");
 
       const article = result.articles.find((article) =>
         article.id === item0_id

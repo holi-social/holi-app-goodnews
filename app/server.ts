@@ -1,4 +1,4 @@
-import { GoodNewsLanguage } from "./api_types.ts";
+import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from "./api_types.ts";
 import {
   createSchema,
   createYoga,
@@ -50,11 +50,22 @@ const typeDefs = gql`
   }
 `;
 
-const createResolvers = (config: ContentfulConfig) => ({
-  Query: {
-    articles: executeArticlesQuery(config),
-  },
-});
+const createResolvers = (config: ContentfulConfig) => {
+  return ({
+    Query: {
+      articles: (
+        // deno-lint-ignore no-explicit-any
+        _parent: any,
+        parameters: { lastDate?: string },
+        context: GraphQLContext,
+      ): Promise<GoodNewsArticleQueryResponse> => {
+        return config.fake
+          ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
+          : executeArticlesQuery(config)(parameters, context.language);
+      },
+    },
+  });
+};
 
 const getLanguage = (languages = "") =>
   languages
@@ -76,6 +87,7 @@ export interface ContentfulConfig {
   environment: string; // default: master
   deliveryApiAccessToken: string;
   pageSize: number;
+  fake: boolean; // For local development. If set, the API returns dummy data
 }
 
 export interface ServerConfig {
@@ -141,6 +153,11 @@ export const startServer = (config: ServerConfig): Promise<void> => {
           hostname === "0.0.0.0" ? "localhost" : hostname
         }:${port}/graphql`,
       );
+      if (config.contentful.fake) {
+        logger.info(
+          `Server is serving fake data due to FAKE env var set to true`,
+        );
+      }
     },
   });
 };
