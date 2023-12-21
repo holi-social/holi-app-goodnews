@@ -69,20 +69,25 @@ export const resolvePictureUrl = (
 export const toGoodNewsArticle = (
   item: ContentfulItem,
   assets: ContentfulAsset[],
-): GoodNewsArticle => {
-  return {
-    id: item.sys.id,
-    date: item.fields.datum,
-    headline: item.fields.headline,
-    teaserText: item.fields.teaserText,
-    pictureUrl: resolvePictureUrl(item, assets),
-    pictureCredit: item.fields.photoCredit,
-    articleUrl: item.fields.articleUrl,
-    source: item.fields.quelle,
-    sortKey: item.fields.sortKey,
-    category: resolveCategory(item.fields),
-    language: item.fields.language,
-  };
+): GoodNewsArticle | undefined => {
+  try {
+    return {
+      id: item.sys.id,
+      date: item.fields.datum,
+      headline: item.fields.headline,
+      teaserText: item.fields.teaserText,
+      pictureUrl: resolvePictureUrl(item, assets),
+      pictureCredit: item.fields.photoCredit,
+      articleUrl: item.fields.articleUrl,
+      source: item.fields.quelle,
+      sortKey: item.fields.sortKey,
+      category: resolveCategory(item.fields),
+      language: item.fields.language,
+    };
+  } catch (error) {
+    logger.error(`Failed to transform article: ${error}`);
+    return undefined;
+  }
 };
 
 const fetchPage =
@@ -175,7 +180,8 @@ async (
         item.fields.datum === responseDate &&
         item.fields.language === validatedLocale,
     )
-    .map((item) => toGoodNewsArticle(item, responseAssets));
+    .map((item) => toGoodNewsArticle(item, responseAssets))
+    .filter((article) => !!article) as GoodNewsArticle[];
 
   const previousDateTeaser: GoodNewsArticle | undefined = !responseDate
     ? undefined

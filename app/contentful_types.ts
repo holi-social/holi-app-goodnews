@@ -8,8 +8,8 @@ export type ContentfulItemBildManuell = {
 
 /** items contain either bildManuell OR bildSource but not both */
 export type ContentfulItemBild =
-  | { bildSource: ContentfulItemBildSource }
-  | { bildManuell: ContentfulItemBildManuell };
+  | { bildSource?: ContentfulItemBildSource }
+  | { bildManuell?: ContentfulItemBildManuell };
 
 export type ContentfulItemCategory = {
   categoryID:
