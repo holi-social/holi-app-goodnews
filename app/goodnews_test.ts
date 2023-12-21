@@ -438,6 +438,38 @@ describe("goodnews", () => {
     });
   });
 
+  it("filters articles without valid image url", () => {
+    const config = mockConfig(2);
+    const itemWithImages = item0("2022-11-29", "de");
+    const itemWithoutImages = {
+      ...itemWithImages,
+      fields: {
+        ...itemWithImages.fields,
+        bildSource: undefined,
+        bildManuell: undefined,
+      },
+    };
+    return withMockedResponses(config, [
+      {
+        skip: 0,
+        limit: 2,
+        items: [itemWithoutImages, item1("2022-11-29", "de")],
+      },
+      {
+        skip: 2,
+        limit: 2,
+        items: [item2("2022-11-29", "de"), item3("2022-11-28", "de")],
+      },
+    ], async () => {
+      const result = await executeArticlesQuery(config)({}, "de");
+
+      // Article with id item0_id should not be part of the result
+      const articleIds = result.articles.map((article) => article.id);
+      assertEquals(result.articles.length, 2);
+      assertEquals(articleIds, [item2_id, item1_id]);
+    });
+  });
+
   it("should include all expected data", () => {
     const config = mockConfig(1);
     return withMockedResponses(config, [
