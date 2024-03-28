@@ -106,10 +106,15 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     ? [
       useResponseCache({
         // global cache per language, shared by all users
-        session: (request: Request) =>
-          getLanguage(
+        session: (request: Request) => {
+          console.log(
+            "Cache Session language header:",
+            request.headers.get("accept-language"),
+          );
+          return getLanguage(
             request.headers.get("accept-language") || DEFAULT_LANGUAGE,
-          ),
+          );
+        },
         ttlPerSchemaCoordinate: {
           "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
         },
@@ -123,6 +128,10 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     plugins,
     context: (context: GraphQLContext) => {
       const headers = new Headers(context.params?.extensions?.headers);
+      console.log(
+        "Context language header:",
+        headers.get("accept-language"),
+      );
       const languages = headers.get("accept-language") || DEFAULT_LANGUAGE;
       return {
         ...context,
