@@ -127,6 +127,7 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     graphiql: true,
     plugins,
     context: (context: GraphQLContext) => {
+      console.log("context:", JSON.stringify(context, null, 2));
       const headers = new Headers(context.params?.extensions?.headers);
       console.log(
         "Context language header:",
