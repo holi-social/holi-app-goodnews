@@ -67,13 +67,16 @@ const createResolvers = (config: ContentfulConfig) => {
   });
 };
 
-const getLanguage = (languages = "") =>
-  languages
+const getLanguage = (languages = "") => {
+  const lang = languages
     .split(",") // languages are comma separated
     .map((language) => language.split("-")[0]) // languages may include country code 'de-DE' e.g.
     .map((language) => language.split(";")[0]) // languages may include a 'de;q=0.6' e.g.
     .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
-  DEFAULT_LANGUAGE;
+    DEFAULT_LANGUAGE;
+  console.log("languages:", lang, "|", languages);
+  return lang;
+};
 
 export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
