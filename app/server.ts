@@ -109,7 +109,7 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
         session: (request: Request) => {
           console.log(
             "Cache Session language header:",
-            request.headers.get("accept-language"),
+            request.headers, //.get("accept-language"),
           );
           return getLanguage(
             request.headers.get("accept-language") || DEFAULT_LANGUAGE,
