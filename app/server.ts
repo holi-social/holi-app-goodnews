@@ -158,7 +158,7 @@ export type GraphQLContext = {
 
 export const startServer = (config: ServerConfig): Promise<void> => {
   const graphQLServer: GraphQLServer = createGraphQLServer(config);
-  return serve(graphQLServer.handleRequest, {
+  return serve(graphQLServer, {
     port: config.port || DEFAULT_PORT,
     onListen({ port, hostname }) {
       logger.info(
