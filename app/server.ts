@@ -1,5 +1,11 @@
 import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from "./api_types.ts";
-import { createSchema, createYoga, gql, useResponseCache } from "./deps.ts";
+import {
+  createSchema,
+  createYoga,
+  gql,
+  serve,
+  useResponseCache,
+} from "./deps.ts";
 import {
   DEFAULT_LANGUAGE,
   executeArticlesQuery,
@@ -150,9 +156,9 @@ export type GraphQLContext = {
   language: GoodNewsLanguage;
 };
 
-export const startServer = (config: ServerConfig) => {
+export const startServer = (config: ServerConfig): Promise<void> => {
   const graphQLServer: GraphQLServer = createGraphQLServer(config);
-  return Deno.serve({
+  return serve(graphQLServer, {
     port: config.port || DEFAULT_PORT,
     onListen({ port, hostname }) {
       logger.info(
@@ -166,5 +172,5 @@ export const startServer = (config: ServerConfig) => {
         );
       }
     },
-  }, graphQLServer);
+  });
 };

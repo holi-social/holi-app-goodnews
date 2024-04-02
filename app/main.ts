@@ -73,4 +73,4 @@ const serverConfigFromEnv = (): ServerConfig => {
 };
 
 const config = serverConfigFromEnv();
-startServer(config);
+await startServer(config);
