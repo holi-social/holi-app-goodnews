@@ -109,6 +109,9 @@ const fetchPage =
     const resultJson = await fetchResult.json();
     const duration = Date.now() - start;
     logger.debug(`fetching articles took ${duration} ms`);
+    logger.debug(
+      "Response item 0: " + JSON.stringify(resultJson.items[0], null, 2),
+    );
     return resultJson;
   };
 

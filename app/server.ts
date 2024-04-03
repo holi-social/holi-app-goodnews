@@ -53,6 +53,7 @@ const createResolvers = (config: ContentfulConfig) => {
         parameters: { lastDate?: string },
         context: GraphQLContext,
       ): Promise<GoodNewsArticleQueryResponse> => {
+        console.log("Resolver context:", context);
         return config.fake
           ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
           : executeArticlesQuery(config)(parameters, context.language);
