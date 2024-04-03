@@ -105,14 +105,22 @@ const fetchPage =
     logger.info(`fetching articles ${skip} to ${skip + limit} from ${baseUrl}`);
 
     const start = Date.now();
-    const fetchResult = await fetch(url);
-    const resultJson = await fetchResult.json();
-    const duration = Date.now() - start;
-    logger.debug(`fetching articles took ${duration} ms`);
-    logger.debug(
-      "Response item 0: " + JSON.stringify(resultJson.items[0], null, 2),
-    );
-    return resultJson;
+    try {
+      const fetchResult = await fetch(url);
+      const resultJson = await fetchResult.json();
+      const duration = Date.now() - start;
+      logger.debug(`fetching articles took ${duration} ms`);
+      logger.debug(
+        "Response item 0: " + JSON.stringify(resultJson.items[0], null, 2),
+      );
+      return resultJson;
+    } catch (err) {
+      logger.error("fetching articles failed: " + err.message);
+      throw err;
+    } finally {
+      const duration = Date.now() - start;
+      logger.debug(`fetching articles took ${duration} ms`);
+    }
   };
 
 type ContentfulItemFilter = (item: ContentfulItem) => boolean;
@@ -174,6 +182,9 @@ async (
     }
     skip = skip + limit;
   }
+  logger.debug(
+    "responseItems" + JSON.stringify(responseItems.slice(0, 2), null, 2),
+  );
 
   const responseArticles: GoodNewsArticle[] = responseItems
     .filter(
@@ -183,6 +194,9 @@ async (
     )
     .map((item) => toGoodNewsArticle(item, responseAssets))
     .filter((article) => !!article) as GoodNewsArticle[];
+  logger.debug(
+    "responseArticles" + JSON.stringify(responseArticles.slice(0, 2), null, 2),
+  );
 
   const previousDateTeaser: GoodNewsArticle | undefined = !responseDate
     ? undefined
