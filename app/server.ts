@@ -56,7 +56,13 @@ const createResolvers = (config: ContentfulConfig) => {
         console.log("Resolver context:", context);
         return config.fake
           ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
-          : executeArticlesQuery(config)(parameters, context.language);
+          : executeArticlesQuery(config)(
+            parameters,
+            getLanguage(
+              context?.request?.headers.get("accept-language") ||
+                DEFAULT_LANGUAGE,
+            ),
+          );
       },
     },
   });
@@ -70,7 +76,7 @@ const getLanguage = (languages = "") => {
     .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
     DEFAULT_LANGUAGE;
   console.log("languages:", lang, "|", languages);
-  return lang;
+  return lang as GoodNewsLanguage;
 };
 
 export const DEFAULT_PORT = 8002;
@@ -121,19 +127,19 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     schema: createSchema({ resolvers, typeDefs }),
     graphiql: true,
     plugins,
-    context: (context: GraphQLContext) => {
-      console.log("context:", JSON.stringify(context, null, 2));
-      const headers = new Headers(context.params?.extensions?.headers);
-      console.log(
-        "Context language header:",
-        headers.get("accept-language"),
-      );
-      const languages = headers.get("accept-language") || DEFAULT_LANGUAGE;
-      return {
-        ...context,
-        language: getLanguage(languages),
-      };
-    },
+    // context: (context: GraphQLContext) => {
+    //   console.log("context:", JSON.stringify(context, null, 2));
+    //   const headers = new Headers(context.params?.extensions?.headers);
+    //   console.log(
+    //     "Context language header:",
+    //     headers.get("accept-language"),
+    //   );
+    //   const languages = headers.get("accept-language") || DEFAULT_LANGUAGE;
+    //   return {
+    //     ...context,
+    //     language: getLanguage(languages),
+    //   };
+    // },
   });
 };
 
@@ -141,6 +147,7 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
 export type GraphQLServer = any;
 
 export type GraphQLContext = {
+  request?: { headers: Headers };
   params?: {
     extensions?: {
       headers?: {
