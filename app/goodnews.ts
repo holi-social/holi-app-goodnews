@@ -107,9 +107,9 @@ const fetchPage =
     const start = Date.now();
     try {
       const fetchResult = await fetch(url);
-      logger.debug("fetch resonse status: " + fetchResult.status);
+      logger.info("fetch resonse status: " + fetchResult.status);
       const resultJson = await fetchResult.json();
-      logger.debug(
+      logger.info(
         "2 Response items: " +
           JSON.stringify(resultJson.items.slice(0, 2), null, 2),
       );
@@ -119,7 +119,7 @@ const fetchPage =
       throw err;
     } finally {
       const duration = Date.now() - start;
-      logger.debug(`fetching articles took ${duration} ms`);
+      logger.info(`fetching articles took ${duration} ms`);
     }
   };
 
@@ -182,7 +182,7 @@ async (
     }
     skip = skip + limit;
   }
-  logger.debug(
+  logger.info(
     "2 responseItems" + JSON.stringify(responseItems.slice(0, 2), null, 2),
   );
 
@@ -194,7 +194,7 @@ async (
     )
     .map((item) => toGoodNewsArticle(item, responseAssets))
     .filter((article) => !!article) as GoodNewsArticle[];
-  logger.debug(
+  logger.info(
     "2 responseArticles" +
       JSON.stringify(responseArticles.slice(0, 2), null, 2),
   );
