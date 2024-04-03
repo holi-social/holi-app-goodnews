@@ -92,7 +92,7 @@ export const toGoodNewsArticle = (
 
 const fetchPage =
   (config: ContentfulConfig) =>
-  (skip: number, limit: number): Promise<ContentfulEntriesResponse> => {
+  async (skip: number, limit: number): Promise<ContentfulEntriesResponse> => {
     // baseUrl used for logging to not leak access_token
     const baseUrl =
       `${config.baseUrl}/${config.spaceId}/environments/${config.environment}/entries`;
@@ -105,13 +105,11 @@ const fetchPage =
     logger.info(`fetching articles ${skip} to ${skip + limit} from ${baseUrl}`);
 
     const start = Date.now();
-    return fetch(url)
-      .then((result) => result.json())
-      .then((result) => {
-        const duration = Date.now() - start;
-        logger.debug(`fetching articles took ${duration} ms`);
-        return result;
-      });
+    const fetchResult = await fetch(url);
+    const resultJson = await fetchResult.json();
+    const duration = Date.now() - start;
+    logger.debug(`fetching articles took ${duration} ms`);
+    return resultJson;
   };
 
 type ContentfulItemFilter = (item: ContentfulItem) => boolean;
