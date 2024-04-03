@@ -107,11 +107,11 @@ const fetchPage =
     const start = Date.now();
     try {
       const fetchResult = await fetch(url);
+      logger.debug("fetch resonse status: " + fetchResult.status);
       const resultJson = await fetchResult.json();
-      const duration = Date.now() - start;
-      logger.debug(`fetching articles took ${duration} ms`);
       logger.debug(
-        "Response item 0: " + JSON.stringify(resultJson.items[0], null, 2),
+        "2 Response items: " +
+          JSON.stringify(resultJson.items.slice(0, 2), null, 2),
       );
       return resultJson;
     } catch (err) {
@@ -183,7 +183,7 @@ async (
     skip = skip + limit;
   }
   logger.debug(
-    "responseItems" + JSON.stringify(responseItems.slice(0, 2), null, 2),
+    "2 responseItems" + JSON.stringify(responseItems.slice(0, 2), null, 2),
   );
 
   const responseArticles: GoodNewsArticle[] = responseItems
@@ -195,7 +195,8 @@ async (
     .map((item) => toGoodNewsArticle(item, responseAssets))
     .filter((article) => !!article) as GoodNewsArticle[];
   logger.debug(
-    "responseArticles" + JSON.stringify(responseArticles.slice(0, 2), null, 2),
+    "2 responseArticles" +
+      JSON.stringify(responseArticles.slice(0, 2), null, 2),
   );
 
   const previousDateTeaser: GoodNewsArticle | undefined = !responseDate
