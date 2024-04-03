@@ -63,23 +63,22 @@ const createResolvers = (config: ContentfulConfig) => {
           ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
           : executeArticlesQuery(config)(
             parameters,
-            getLanguage(
-              context?.request?.headers.get("accept-language") ||
-                DEFAULT_LANGUAGE,
-            ),
+            getLanguage(context?.request?.headers),
           );
       },
     },
   });
 };
 
-const getLanguage = (languages = "") =>
-  (languages
+const getLanguage = (headers?: Headers) => {
+  const languages: string = headers?.get("accept-language") || DEFAULT_LANGUAGE;
+  return (languages
     .split(",") // languages are comma separated
     .map((language) => language.split("-")[0]) // languages may include country code 'de-DE' e.g.
     .map((language) => language.split(";")[0]) // languages may include a 'de;q=0.6' e.g.
     .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
     DEFAULT_LANGUAGE) as GoodNewsLanguage;
+};
 
 export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
@@ -109,10 +108,7 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     ? [
       useResponseCache({
         // global cache per language, shared by all users
-        session: (request: Request) =>
-          getLanguage(
-            request.headers.get("accept-language") || DEFAULT_LANGUAGE,
-          ),
+        session: (request: Request) => getLanguage(request.headers),
         ttlPerSchemaCoordinate: {
           "Query.articles": config.cacheTtlMs || DEFAULT_CACHE_TTL_MS,
         },
@@ -139,12 +135,11 @@ export type GraphQLContext = {
       };
     };
   };
-  language: GoodNewsLanguage;
 };
 
 export const startServer = (config: ServerConfig): Promise<void> => {
   const graphQLServer: GraphQLServer = createGraphQLServer(config);
-  return serve(graphQLServer.handleRequest, {
+  return serve(graphQLServer, {
     port: config.port || DEFAULT_PORT,
     onListen({ port, hostname }) {
       logger.info(
