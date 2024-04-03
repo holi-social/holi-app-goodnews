@@ -61,19 +61,25 @@ const createResolvers = (config: ContentfulConfig) => {
       ): Promise<GoodNewsArticleQueryResponse> => {
         return config.fake
           ? Promise.resolve({ articles: [], previousDateTeaser: undefined })
-          : executeArticlesQuery(config)(parameters, context.language);
+          : executeArticlesQuery(config)(
+            parameters,
+            getLanguage(
+              context?.request?.headers.get("accept-language") ||
+                DEFAULT_LANGUAGE,
+            ),
+          );
       },
     },
   });
 };
 
 const getLanguage = (languages = "") =>
-  languages
+  (languages
     .split(",") // languages are comma separated
     .map((language) => language.split("-")[0]) // languages may include country code 'de-DE' e.g.
     .map((language) => language.split(";")[0]) // languages may include a 'de;q=0.6' e.g.
     .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
-  DEFAULT_LANGUAGE;
+    DEFAULT_LANGUAGE) as GoodNewsLanguage;
 
 export const DEFAULT_PORT = 8002;
 export const DEFAULT_CACHE_ENABLED = true;
@@ -118,14 +124,6 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
     schema: createSchema({ resolvers, typeDefs }),
     graphiql: true,
     plugins,
-    context: (context: GraphQLContext) => {
-      const headers = new Headers(context.params?.extensions?.headers);
-      const languages = headers.get("accept-language") || DEFAULT_LANGUAGE;
-      return {
-        ...context,
-        language: getLanguage(languages),
-      };
-    },
   });
 };
 
@@ -133,6 +131,7 @@ export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
 export type GraphQLServer = any;
 
 export type GraphQLContext = {
+  request?: { headers: Headers };
   params?: {
     extensions?: {
       headers?: {
