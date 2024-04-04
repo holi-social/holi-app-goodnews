@@ -54,8 +54,7 @@ resource "google_cloud_run_service" "goodnews_api" {
         }
         env {
           name  = "CACHE_TTL_MS"
-          value = local.environment == "production" ? "43200000" : "60000"
-          # 12 hours for production, otherwise 1 minute
+          value = local.environment == "production" ? "43200000" : "43200000"
         }
         env {
           name = "CONTENTFUL_BASE_URL"
@@ -100,7 +99,7 @@ resource "google_cloud_run_service" "goodnews_api" {
             memory = local.environment == "production" ? "512Mi" : "256Mi"
           }
           requests = {
-            cpu    = local.environment == "production" ? "1000m" : "10m"
+            cpu    = local.environment == "production" ? "1000m" : "1000m"
             memory = local.environment == "production" ? "512Mi" : "256Mi"
           }
         }
