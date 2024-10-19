@@ -103,7 +103,7 @@ const fetchPage =
       const fetchResult = await fetch(url)
       const resultJson = await fetchResult.json()
       return resultJson
-    } catch (err) {
+    } catch (err: any) {
       logger.error('fetching articles failed: ' + err.message)
       throw err
     } finally {
