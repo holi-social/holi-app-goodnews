@@ -171,7 +171,6 @@ staging_trigger_unified-api_redeployment:
   only:
     - main
 
-
 ## production environment
 
 production_deploy:
