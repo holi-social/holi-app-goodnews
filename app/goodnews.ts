@@ -103,7 +103,8 @@ const fetchPage =
       const fetchResult = await fetch(url)
       const resultJson = await fetchResult.json()
       return resultJson
-    } catch (err) {
+      // deno-lint-ignore no-explicit-any
+    } catch (err: any) {
       logger.error('fetching articles failed: ' + err.message)
       throw err
     } finally {
