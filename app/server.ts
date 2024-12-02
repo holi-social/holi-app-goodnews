@@ -1,5 +1,5 @@
 import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from './api_types.ts'
-import { createSchema, createYoga, gql, serve, useResponseCache } from './deps.ts'
+import { createSchema, createYoga, gql, useResponseCache } from './deps.ts'
 import { DEFAULT_LANGUAGE, executeArticlesQuery, SUPPORTED_LANGUAGES } from './goodnews.ts'
 import { logger } from './logging.ts'
 
@@ -94,6 +94,8 @@ export interface ServerConfig {
   contentful: ContentfulConfig
 }
 
+const isAlive = () => new Response(`${true}`)
+
 export const createGraphQLServer = (config: ServerConfig): GraphQLServer => {
   const plugins = config.cacheEnabled || DEFAULT_CACHE_ENABLED
     ? [
@@ -128,17 +130,23 @@ export type GraphQLContext = {
   }
 }
 
-export const startServer = (config: ServerConfig): Promise<void> => {
+export const startServer = (config: ServerConfig): Deno.HttpServer<Deno.NetAddr> => {
   const graphQLServer: GraphQLServer = createGraphQLServer(config)
-  return serve(graphQLServer, {
+  return Deno.serve({
     port: config.port || DEFAULT_PORT,
+    handler: (req: Request) => {
+      const url = new URL(req.url)
+      const pathname = url.pathname
+      if (pathname.startsWith('/health') || pathname.startsWith('/ready')) return isAlive()
+      return graphQLServer.handleRequest(req)
+    },
     onListen({ port, hostname }) {
       logger.info(
         `Server started at http://${hostname === '0.0.0.0' ? 'localhost' : hostname}:${port}/graphql`,
       )
       if (config.contentful.fake) {
         logger.info(
-          `Server is serving fake data due to FAKE env var set to true`,
+          'Server is serving fake data due to FAKE env var set to true',
         )
       }
     },
