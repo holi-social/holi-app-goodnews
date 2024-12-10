@@ -1,6 +1,6 @@
-import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from './api_types.ts'
+import { GoodNewsArticleQueryResponse } from './api_types.ts'
 import { createSchema, createYoga, gql, useResponseCache } from './deps.ts'
-import { DEFAULT_LANGUAGE, executeArticlesQuery, SUPPORTED_LANGUAGES } from './goodnews.ts'
+import { executeArticlesQuery } from './goodnews.ts'
 import { logger } from './logging.ts'
 
 const typeDefs = gql`
@@ -60,16 +60,20 @@ const createResolvers = (config: ContentfulConfig) => {
   })
 }
 
-const getLanguage = (headers?: Headers) => {
-  const languages: string = headers?.get('accept-language') || DEFAULT_LANGUAGE
-  return (languages
-    .split(',') // languages are comma separated
-    .map((language) => language.split('-')[0]) // languages may include country code 'de-DE' e.g.
-    .map((language) => language.split(';')[0]) // languages may include a 'de;q=0.6' e.g.
-    .map((language) => language.trim())
-    .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
-    DEFAULT_LANGUAGE) as GoodNewsLanguage
-}
+// deno-lint-ignore no-unused-vars
+const getLanguage = (headers?: Headers) => 'de' // temporarily forced to German until GoodNews is back with English content
+
+// TODO: uncomment this once GoodNews is back with English content
+// const getLanguage = (headers?: Headers) => {
+//   const languages: string = headers?.get('accept-language') || DEFAULT_LANGUAGE
+//   return (languages
+//     .split(',') // languages are comma separated
+//     .map((language) => language.split('-')[0]) // languages may include country code 'de-DE' e.g.
+//     .map((language) => language.split(';')[0]) // languages may include a 'de;q=0.6' e.g.
+//     .map((language) => language.trim())
+//     .find((language) => SUPPORTED_LANGUAGES.includes(language)) ||
+//     DEFAULT_LANGUAGE) as GoodNewsLanguage
+// }
 
 export const DEFAULT_PORT = 8002
 export const DEFAULT_CACHE_ENABLED = true
