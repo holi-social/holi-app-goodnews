@@ -1,4 +1,4 @@
-import { GoodNewsArticleQueryResponse } from './api_types.ts'
+import { GoodNewsArticleQueryResponse, GoodNewsLanguage } from './api_types.ts'
 import { createSchema, createYoga, gql, useResponseCache } from './deps.ts'
 import { executeArticlesQuery } from './goodnews.ts'
 import { logger } from './logging.ts'
@@ -61,7 +61,7 @@ const createResolvers = (config: ContentfulConfig) => {
 }
 
 // deno-lint-ignore no-unused-vars
-const getLanguage = (headers?: Headers) => 'de' // temporarily forced to German until GoodNews is back with English content
+const getLanguage = (headers?: Headers) => 'de' as GoodNewsLanguage // temporarily forced to German until GoodNews is back with English content
 
 // TODO: uncomment this once GoodNews is back with English content
 // const getLanguage = (headers?: Headers) => {
