@@ -11,7 +11,28 @@ default:
 variables:
   API_DOMAIN_PATH: '$CI_PROJECT_DIR/api_domain'
 
+stages:
+  - test
+  - build
+  - deploy
+  - deploy_production
+
 # job templates
+
+.rule_templates:
+  only_main:
+    - if: $CI_COMMIT_BRANCH == 'main'
+      when: on_success
+  only_review:
+    - if: $CI_COMMIT_BRANCH =~ /^main$|^noenv\/.*/
+      when: never
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
+  manually_review:
+    - if: $CI_COMMIT_BRANCH =~ /^main$|^noenv\/.*/
+      when: never
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
 
 .deploy:
   image:
@@ -72,6 +93,7 @@ include:
 build_docker:
   needs: ['cache_lint_test']
   image: 'europe-north1-docker.pkg.dev/holi-shared/docker-hub-remote/docker:27'
+  stage: build
   services:
     - name: 'europe-north1-docker.pkg.dev/holi-shared/docker-hub-remote/docker:27-dind'
       alias: 'docker'
@@ -90,28 +112,25 @@ build_docker:
 review_deploy:
   extends: .deploy
   needs: ['build_docker']
+  stage: deploy
   environment:
     name: review/$CI_COMMIT_REF_SLUG
     url: https://$CI_ENVIRONMENT_SLUG.goodnews.apis.holi.social
     on_stop: review_destroy
     auto_stop_in: 1 week
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /^main$|^noenv\/.*/
-      when: never
-    - if: $CI_COMMIT_BRANCH
-      when: on_success
+    - !reference [.rule_templates, only_review]
 
 review_smoketest:
   extends: .smoketest
   needs: ['review_deploy']
+  stage: deploy
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /^main$|^noenv\/.*/
-      when: never
-    - if: $CI_COMMIT_BRANCH
-      when: on_success
+    - !reference [.rule_templates, only_review]
 
 review_destroy:
   needs: ['review_deploy']
+  stage: deploy
   image:
     name: 'europe-north1-docker.pkg.dev/holi-shared/docker-hub-remote/hashicorp/terraform:1.9.8'
     # default entrypoint is terraform command, but we want to run shell scripts
@@ -138,10 +157,7 @@ review_destroy:
     - terraform/environments/scripts/destroy-env.sh "$CI_ENVIRONMENT_SLUG"
   allow_failure: true
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /^main$|^noenv\/.*/
-      when: never
-    - if: $CI_COMMIT_BRANCH
-      when: manual
+    - !reference [.rule_templates, manually_review]
   resource_group: $ENVIRONMENT_ID # never execute terraform in parallel on the same environment
   interruptible: false
 
@@ -150,6 +166,7 @@ review_destroy:
 staging_deploy:
   extends: .deploy
   needs: ['build_docker']
+  stage: deploy
   environment:
     name: staging
     deployment_tier: staging
@@ -157,31 +174,31 @@ staging_deploy:
   variables:
     ENVIRONMENT_ID: staging
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
 
 staging_smoketest:
   extends: .smoketest
   needs: ['staging_deploy']
+  stage: deploy
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
   resource_group: unified-api-staging
 
 staging_trigger_unified-api_redeployment:
   needs: ['staging_smoketest']
+  stage: deploy
   trigger:
     project: 'app/holi-unified-api'
     branch: 'main'
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
 
 ## production environment
 
 production_deploy:
   extends: .deploy
   needs: ['staging_smoketest']
+  stage: deploy_production
   allow_failure: false
   environment:
     name: production
@@ -190,22 +207,21 @@ production_deploy:
   variables:
     ENVIRONMENT_ID: production
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
 
 production_smoketest:
   extends: .smoketest
   needs: ['production_deploy']
+  stage: deploy_production
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
 
 production_trigger_unified-api_redeployment:
   needs: ['production_smoketest']
+  stage: deploy_production
   trigger:
     project: 'app/holi-unified-api'
     branch: 'production'
   rules:
-    - if: $CI_COMMIT_BRANCH == 'main'
-      when: on_success
+    - !reference [.rule_templates, only_main]
   resource_group: unified-api-production
