@@ -1,4 +1,4 @@
-import { afterEach, assert, assertEquals, assertExists, describe, it, Stub } from './dev_deps.ts'
+import { assert, assertEquals, assertExists, describe, it } from './dev_deps.ts'
 import {
   contentfulResponse,
   item0,
@@ -477,7 +477,6 @@ describe('goodnews', () => {
 })
 
 describe('GoodNews server', () => {
-  let fetchStub: Stub
   const contentfulConfig = mockConfig(2)
   const config: ServerConfig = {
     cacheEnabled: false,
@@ -523,10 +522,6 @@ describe('GoodNews server', () => {
       (result) => result?.articles as TestGoodNewsResponse,
     )
   }
-
-  afterEach(() => {
-    fetchStub?.restore()
-  })
 
   it('correctly extracts language from locale', () => {
     return withMockedResponses(contentfulConfig, responses, async () => {
